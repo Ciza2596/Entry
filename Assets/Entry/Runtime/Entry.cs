@@ -27,9 +27,6 @@ namespace Entry
 
         public static void Release()
         {
-            if(!IsInitialized)
-                return;
-
             _container.RemoveAll();
             _entryUpdateComponent.RemoveCallback();
 
@@ -47,7 +44,7 @@ namespace Entry
             if (CheckIsNotInitialized())
                 return null;
 
-            return _container.Bind<TObject, TObject>(parameters);
+            return _container.Bind<TObject>(parameters);
         }
 
         public static TKey Bind<TKey, TObject>(params object[] parameters) where TObject : class where TKey : class

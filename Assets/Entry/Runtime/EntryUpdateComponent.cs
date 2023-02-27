@@ -18,7 +18,11 @@ namespace Entry
         private void FixedUpdate() =>
             _fixedUpdateCallback?.Invoke(Time.fixedDeltaTime);
 
+
+        private void OnApplicationQuit() =>
+            Entry.Release();
         
+
 
         //public method
         public void SetUpdateCallback(Action<float> updateCallback) =>
