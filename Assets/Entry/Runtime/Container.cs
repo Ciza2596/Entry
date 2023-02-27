@@ -13,8 +13,8 @@ namespace Entry
         private Action<float> _fixedUpdateHandle;
 
 
-        private List<Type> _cantBeKeys = new List<Type>(4)
-            { typeof(IInitializable), typeof(IUpdatable), typeof(IFixedUpdatable), typeof(IReleasable) };
+        private readonly List<Type> _cantBeKeys = new List<Type>(4)
+            { typeof(IUpdatable), typeof(IFixedUpdatable), typeof(IReleasable) };
 
         private readonly Dictionary<Type, object> _container = new Dictionary<Type, object>();
 
@@ -35,7 +35,6 @@ namespace Entry
         public TKey Bind<TKey, TObject>(params object[] parameters) where TObject : class where TKey : class
         {
             var key = typeof(TKey);
-            var objType = typeof(TObject);
 
             if (_cantBeKeys.Contains(key))
             {
@@ -49,10 +48,8 @@ namespace Entry
                 return null;
             }
 
-            var obj = (TObject)Activator.CreateInstance(objType);
-
-            if (obj is IInitializable initializable)
-                initializable.Initialize(parameters);
+            var objType = typeof(TObject);
+            var obj = (TObject)Activator.CreateInstance(objType, parameters);
 
             AddUpdateAndFixedUpdate(obj);
 

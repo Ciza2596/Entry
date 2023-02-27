@@ -20,13 +20,13 @@ public class EntryTest
     
 
     [Test]
-    public void _01_Initializable()
+    public void _01_Constructor()
     {
         //act
-        var fakeInitializable = _container.Bind<FakeInitializable>("Hello");
+        var fakeConstructor = _container.Bind<FakeConstructor>("Hello");
 
         //assert
-        Assert.IsTrue(!string.IsNullOrWhiteSpace(fakeInitializable.Result), "The object doesnt initialize.");
+        Assert.IsTrue(!string.IsNullOrWhiteSpace(fakeConstructor.Result), "The object doesnt initialize.");
     }
 
     [Test]
