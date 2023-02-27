@@ -13,7 +13,7 @@ public class EntryTest
     [TearDown]
     public void TearDown()
     {
-        _container.RemoveAll();
+        _container.RemoveAllRootObjects();
         _container = null;
     }
 
@@ -23,7 +23,8 @@ public class EntryTest
     public void _01_Constructor()
     {
         //act
-        var fakeConstructor = _container.Bind<FakeConstructor>("Hello");
+        _container.Bind<FakeConstructor>("Hello");
+        _container.TryResolve<FakeConstructor>(out var fakeConstructor);
 
         //assert
         Assert.IsTrue(!string.IsNullOrWhiteSpace(fakeConstructor.Result), "The object doesnt initialize.");
@@ -33,7 +34,8 @@ public class EntryTest
     public void _02_Updatable()
     {
         //arrange
-        var fakeUpdatable = _container.Bind<FakeUpdatable>();
+        _container.Bind<FakeUpdatable>();
+        _container.TryResolve<FakeUpdatable>(out var fakeUpdatable);
         var deltaTime = 0.02f;
         
         //act
@@ -47,7 +49,8 @@ public class EntryTest
     public void _03_FixedUpdatable()
     {
         //arrange
-        var fakeFixedUpdatable = _container.Bind<FakeFixedUpdatable>();
+        _container.Bind<FakeFixedUpdatable>();
+        _container.TryResolve<FakeFixedUpdatable>(out var fakeFixedUpdatable);
         var fixedDeltaTime = 0.02f;
         
         //act
@@ -61,7 +64,8 @@ public class EntryTest
     public void _04_Release()
     {
         //arrange
-        var fakeReleasable = _container.Bind<FakeReleasable>();
+        _container.Bind<FakeReleasable>();
+        _container.TryResolve<FakeReleasable>(out var fakeReleasable);
         
         //act
         _container.Remove<FakeReleasable>();

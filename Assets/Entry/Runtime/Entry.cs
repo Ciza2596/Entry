@@ -27,7 +27,7 @@ namespace Entry
 
         public static void Release()
         {
-            _container.RemoveAll();
+            _container.RemoveAllRootObjects();
             _entryUpdateComponent.RemoveCallback();
 
             _container = null;
@@ -39,48 +39,50 @@ namespace Entry
         }
 
 
-        public static TObject Bind<TObject>(params object[] parameters) where TObject : class
+        public static void Bind<TRootObject>(params object[] parameters) where TRootObject : class
         {
             if (CheckIsNotInitialized())
-                return null;
+                return;
 
-            return _container.Bind<TObject>(parameters);
+            _container.Bind<TRootObject>(parameters);
         }
 
-        public static TKey Bind<TKey, TObject>(params object[] parameters) where TObject : class where TKey : class
+        public static void Bind<TRegisteredObject, TRootObject>(params object[] parameters)
+            where TRegisteredObject : class where TRootObject : class
         {
             if (CheckIsNotInitialized())
-                return null;
+                return;
 
-            return _container.Bind<TKey, TObject>(parameters);
+            _container.Bind<TRegisteredObject, TRootObject>(parameters);
         }
 
-        public static bool TryResolve<TKey>(out TKey obj) where TKey : class
+        public static bool TryResolve<TRegisteredObject>(out TRegisteredObject obj) where TRegisteredObject : class
         {
             obj = null;
             if (CheckIsNotInitialized())
                 return false;
 
-            return _container.TryResolve<TKey>(out obj);
+            return _container.TryResolve<TRegisteredObject>(out obj);
         }
 
-        public static void Remove<TKey>() where TKey : class
+        public static void Remove<TRegisteredObject>() where TRegisteredObject : class
         {
             if (CheckIsNotInitialized())
                 return;
 
-            _container.Remove<TKey>();
+            _container.Remove<TRegisteredObject>();
         }
 
-        public static void RemoveAll()
+        public static void RemoveAllRootObjects()
         {
             if (CheckIsNotInitialized())
                 return;
 
-            _container.RemoveAll();
+            _container.RemoveAllRootObjects();
         }
 
 
+        //private method
         private static bool CheckIsNotInitialized()
         {
             if (!IsInitialized)
