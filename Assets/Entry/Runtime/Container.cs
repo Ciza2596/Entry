@@ -24,20 +24,22 @@ namespace Entry
         //Unity callback
         public void Update(float deltaTime) =>
             _updateHandle?.Invoke(deltaTime);
-
-
+        
         public void FixedUpdate(float fixedDeltaTime) =>
             _fixedUpdateHandle?.Invoke(fixedDeltaTime);
 
+        
 
         //public method
         public Type[] GetRootObjectTypes() => _rootObjectDataMap.Keys.ToArray();
         public Type[] GetRegisteredObjectTypes() => _rootObjectTypeMap.Keys.ToArray();
+
         public Type[] GetRegisteredObjectTypes(Type rootObjectType)
         {
             var rootObjectData = _rootObjectDataMap[rootObjectType];
             return rootObjectData.RegisteredTypes;
         }
+
         public bool TryGetGameLoopObjectTypes(Type rootObjectType, out Type[] gameLoopTypes)
         {
             var rootObjectData = _rootObjectDataMap[rootObjectType];
@@ -45,74 +47,36 @@ namespace Entry
             return gameLoopTypes != null && gameLoopTypes.Length > 0;
         }
 
-
-        //new instance by container
-        public void Bind<TRootObject>(params object[] parameters) where TRootObject : class =>
-            Bind<TRootObject, TRootObject>(parameters);
-
-        public void Bind<TRegisteredObject, TRootObject>(params object[] parameters)
-            where TRegisteredObject : class where TRootObject : class
-        {
-            var rootObject = Activator.CreateInstance(typeof(TRootObject), parameters);
-            BindFromInstance(typeof(TRegisteredObject), rootObject);
-        }
-        public void BindAndSelf<TRegisteredObject, TRootObject>(params object[] parameters)
-            where TRegisteredObject : class where TRootObject : class
-        {
-            var rootObject = Activator.CreateInstance(typeof(TRootObject), parameters);
-            BindFromInstance(typeof(TRegisteredObject), rootObject, true);
-        }
-
-        public void BindInheritances<TRootObject>(params object[] parameters) where TRootObject : class
-        {
-            var rootObjectType = typeof(TRootObject);
-            var rootObject = Activator.CreateInstance(rootObjectType, parameters);
-            var canBeRegisteredTypes = GetCanBeRegisteredTypes(rootObjectType);
-
-            foreach (var canBeRegisteredType in canBeRegisteredTypes)
-                BindFromInstance(canBeRegisteredType, rootObject);
-        }
-        public void BindInheritancesAndSelf<TRootObject>(params object[] parameters) where TRootObject : class
-        {
-            var rootObjectType = typeof(TRootObject);
-            var rootObject = Activator.CreateInstance(rootObjectType, parameters);
-            var canBeRegisteredTypes = GetCanBeRegisteredTypes(rootObjectType);
-
-            foreach (var canBeRegisteredType in canBeRegisteredTypes)
-                BindFromInstance(canBeRegisteredType, rootObject, true);
-        }
-
-
-        //instance form outside
-        public void BindFromInstance<TRootObject>(TRootObject rootObject) where TRootObject : class =>
+        public void Bind<TRootObject>(TRootObject rootObject) where TRootObject : class =>
             Bind<TRootObject, TRootObject>(rootObject);
 
-        public void BindFromInstance<TRegisteredObject, TRootObject>(TRootObject rootObject)
+        public void Bind<TRegisteredObject, TRootObject>(TRootObject rootObject)
             where TRegisteredObject : class where TRootObject : class =>
-            BindFromInstance(typeof(TRegisteredObject), rootObject);
-        public void BindAndSelfFromInstance<TRegisteredObject, TRootObject>(TRootObject rootObject)
-            where TRegisteredObject : class where TRootObject : class =>
-            BindFromInstance(typeof(TRegisteredObject), rootObject,true);
+            Bind(typeof(TRegisteredObject), rootObject);
 
-        public void BindInheritancesFromInstance<TRootObject>(TRootObject rootObject) where TRootObject : class
+        public void BindAndSelf<TRegisteredObject, TRootObject>(TRootObject rootObject)
+            where TRegisteredObject : class where TRootObject : class =>
+            Bind(typeof(TRegisteredObject), rootObject, true);
+
+        public void BindInheritances<TRootObject>(TRootObject rootObject) where TRootObject : class
         {
             var rootObjectType = typeof(TRootObject);
             var canBeRegisteredTypes = GetCanBeRegisteredTypes(rootObjectType);
 
             foreach (var canBeRegisteredType in canBeRegisteredTypes)
-                BindFromInstance(canBeRegisteredType, rootObject);
+                Bind(canBeRegisteredType, rootObject);
         }
-        public void BindInheritancesAndSelfFromInstance<TRootObject>(TRootObject rootObject) where TRootObject : class
+
+        public void BindInheritancesAndSelf<TRootObject>(TRootObject rootObject) where TRootObject : class
         {
             var rootObjectType = typeof(TRootObject);
             var canBeRegisteredTypes = GetCanBeRegisteredTypes(rootObjectType);
 
             foreach (var canBeRegisteredType in canBeRegisteredTypes)
-                BindFromInstance(canBeRegisteredType, rootObject,true);
+                Bind(canBeRegisteredType, rootObject, true);
         }
 
-        
-        
+
         public bool TryResolve<TRegisteredObject>(out TRegisteredObject registeredObject)
             where TRegisteredObject : class
         {
@@ -138,14 +102,28 @@ namespace Entry
         }
 
 
-        
-        public void Remove<TRegisteredObject>() where TRegisteredObject : class =>
-            Remove(typeof(TRegisteredObject));
-        
-        public void RemoveRootObject<TRegisteredObject>() where TRegisteredObject : class =>
-            RemoveRootObjectByRegisteredObjectType(typeof(TRegisteredObject));
+        public void Remove(Type registeredType)
+        {
+            if (!_rootObjectTypeMap.TryGetValue(registeredType, out var rootObjectType))
+            {
+                Debug.LogError($"[Container::Remove] RegisteredType: {registeredType} is already removed.");
+                return;
+            }
 
+            _rootObjectTypeMap.Remove(registeredType);
 
+            var rootObjectData = _rootObjectDataMap[rootObjectType];
+            rootObjectData.RemoveRegisteredType(registeredType);
+
+            if (rootObjectData.RegisteredTypeCount > 0)
+                return;
+
+            RemoveRootObjectByRootObjectType(rootObjectType);
+        }
+
+        public void RemoveRootObject(Type registeredType) =>
+            RemoveRootObjectByRegisteredObjectType(registeredType);
+        
         public void RemoveAllRootObjects()
         {
             var rootObjectTypes = _rootObjectDataMap.Keys.ToArray();
@@ -153,9 +131,11 @@ namespace Entry
                 RemoveRootObjectByRootObjectType(rootObjectType);
         }
 
+        
+        
 
         //private method
-        private void BindFromInstance<TRootObject>(Type registeredType, TRootObject rootObject,bool isBindSelf = false)
+        private void Bind<TRootObject>(Type registeredType, TRootObject rootObject, bool isBindSelf = false)
         {
             var rootObjectType = rootObject.GetType();
 
@@ -189,8 +169,7 @@ namespace Entry
             var canBeRegisteredTypes = GetCanBeRegisteredTypes(rootObjectType);
             return canBeRegisteredTypes.Contains(registeredType);
         }
-
-
+        
         private Type[] GetCanBeRegisteredTypes(Type rootObjectType)
         {
             var rootObjectInterfaces = rootObjectType.GetInterfaces().ToList();
@@ -206,7 +185,7 @@ namespace Entry
 
             return rootObjectInterfaces.ToArray();
         }
-        
+
         private Type[] GetGameLoopTypes(Type rootObjectType)
         {
             var rootObjectInterfaces = rootObjectType.GetInterfaces().ToList();
@@ -246,32 +225,13 @@ namespace Entry
             if (rootObject is IFixedUpdatable fixedUpdatable)
                 _fixedUpdateHandle -= fixedUpdatable.FixedUpdate;
         }
-
-
-        private void Remove(Type registeredType)
-        {
-            if (!_rootObjectTypeMap.TryGetValue(registeredType, out var rootObjectType))
-            {
-                Debug.LogError($"[Container::Remove] RegisteredType: {registeredType} is already removed.");
-                return;
-            }
-
-            _rootObjectTypeMap.Remove(registeredType);
-
-            var rootObjectData = _rootObjectDataMap[rootObjectType];
-            rootObjectData.RemoveRegisteredType(registeredType);
-
-            if (rootObjectData.RegisteredTypeCount > 0)
-                return;
-
-            RemoveRootObjectByRootObjectType(rootObjectType);
-        }
-
+        
         private void RemoveRootObjectByRootObjectType(Type rootObjectType)
         {
             if (!_rootObjectDataMap.TryGetValue(rootObjectType, out var rootObjectData))
             {
-                Debug.LogWarning($"[Container::RemoveRootObjectByRootObjectType] RootObjectType: {rootObjectType} is already removed.");
+                Debug.LogWarning(
+                    $"[Container::RemoveRootObjectByRootObjectType] RootObjectType: {rootObjectType} is already removed.");
                 return;
             }
 

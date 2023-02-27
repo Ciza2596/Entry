@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Entry
 {
@@ -39,38 +41,38 @@ namespace Entry
         }
 
 
-        public static void Bind<TRootObject>(params object[] parameters) where TRootObject : class
+        public static void Bind<TRootObject>(TRootObject rootObject) where TRootObject : class
         {
             if (CheckIsNotInitialized())
                 return;
 
-            _container.Bind<TRootObject>(parameters);
+            _container.Bind(rootObject);
         }
 
-        public static void Bind<TRegisteredObject, TRootObject>(params object[] parameters)
+        public static void Bind<TRegisteredObject, TRootObject>(TRootObject rootObject)
             where TRegisteredObject : class where TRootObject : class
         {
             if (CheckIsNotInitialized())
                 return;
 
-            _container.Bind<TRegisteredObject, TRootObject>(parameters);
+            _container.Bind<TRegisteredObject, TRootObject>(rootObject);
         }
 
-        public static bool TryResolve<TRegisteredObject>(out TRegisteredObject obj) where TRegisteredObject : class
+        public static bool TryResolve<TRegisteredObject>(out TRegisteredObject registeredObject) where TRegisteredObject : class
         {
-            obj = null;
+            registeredObject = null;
             if (CheckIsNotInitialized())
                 return false;
 
-            return _container.TryResolve<TRegisteredObject>(out obj);
+            return _container.TryResolve(out registeredObject);
         }
 
-        public static void Remove<TRegisteredObject>() where TRegisteredObject : class
+        public static void Remove(Type registeredType)
         {
             if (CheckIsNotInitialized())
                 return;
 
-            _container.Remove<TRegisteredObject>();
+            _container.Remove(registeredType);
         }
 
         public static void RemoveAllRootObjects()
