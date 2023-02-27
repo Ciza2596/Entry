@@ -13,7 +13,7 @@ namespace Entry
         private Action<float> _fixedUpdateHandle;
 
 
-        private List<Type> _cantBeKeys = new List<Type>(4) 
+        private List<Type> _cantBeKeys = new List<Type>(4)
             { typeof(IInitializable), typeof(IUpdatable), typeof(IFixedUpdatable), typeof(IReleasable) };
 
         private readonly Dictionary<Type, object> _container = new Dictionary<Type, object>();
@@ -21,11 +21,11 @@ namespace Entry
 
         //Unity callback
         public void Update(float deltaTime) =>
-            _updateHandle(deltaTime);
+            _updateHandle?.Invoke(deltaTime);
 
 
         public void FixedUpdate(float fixedDeltaTime) =>
-            _fixedUpdateHandle(fixedDeltaTime);
+            _fixedUpdateHandle?.Invoke(fixedDeltaTime);
 
 
         //public method
@@ -39,13 +39,13 @@ namespace Entry
 
             if (_cantBeKeys.Contains(key))
             {
-                Debug.LogError($"[Entry::Bind] Cant use key: {key}.");
+                Debug.LogError($"[Container::Bind] Cant use key: {key}.");
                 return null;
             }
-            
+
             if (_container.ContainsKey(key))
             {
-                Debug.LogError($"[Entry::Bind] Already has key: {key}.");
+                Debug.LogError($"[Container::Bind] Already has key: {key}.");
                 return null;
             }
 
@@ -66,16 +66,16 @@ namespace Entry
             obj = null;
 
             var key = typeof(TKey);
-            
+
             if (_cantBeKeys.Contains(key))
             {
-                Debug.LogError($"[Entry::TryResolve] Cant use key: {key}.");
+                Debug.LogError($"[Container::TryResolve] Cant use key: {key}.");
                 return false;
             }
-            
+
             if (!_container.TryGetValue(key, out var value))
             {
-                Debug.LogWarning($"[Entry::TryResolve] Not find object by key: {key}.");
+                Debug.LogWarning($"[Container::TryResolve] Not find object by key: {key}.");
                 return false;
             }
 
@@ -123,7 +123,7 @@ namespace Entry
         {
             if (!_container.TryGetValue(key, out var obj))
             {
-                Debug.LogError($"[Entry::Remove] Not find object by key: {key}.");
+                Debug.LogError($"[Container::Remove] Not find object by key: {key}.");
                 return;
             }
 
