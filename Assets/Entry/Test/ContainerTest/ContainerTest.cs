@@ -42,6 +42,7 @@ public class ContainerTest
         //act
         _container.Bind<IFakeRegisteredObject1>(fakeRootObject);
 
+
         //assert
         Check_RegisteredObjectTypes_Match(new[] { typeof(IFakeRegisteredObject1) }, fakeRootObject.GetType());
     }

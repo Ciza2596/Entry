@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Entry
 {
-    internal class EntryUpdateComponent : MonoBehaviour
+    internal class EntryComponent : MonoBehaviour
     {
         //private variable
         private Action<float> _updateCallback;
