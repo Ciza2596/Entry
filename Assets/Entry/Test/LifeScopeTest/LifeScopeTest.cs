@@ -2,7 +2,7 @@ using System;
 using Entry;
 using NUnit.Framework;
 
-public class ContainerLifeScopeTest
+public class LifeScopeTest
 {
     private Container _container;
 
@@ -25,7 +25,7 @@ public class ContainerLifeScopeTest
     {
         //arrange
         var fakeUpdatable = Bind_And_Resolve(new FakeUpdatable());
-        Check_LifeScope_Match(fakeUpdatable.GetType(), typeof(IUpdatable));
+        Check_LifeScopeType_Match(typeof(IUpdatable), fakeUpdatable.GetType());
         
         var deltaTime = 0.02f;
 
@@ -41,7 +41,7 @@ public class ContainerLifeScopeTest
     {
         //arrange
         var fakeFixedUpdatable = Bind_And_Resolve(new FakeFixedUpdatable());
-        Check_LifeScope_Match(fakeFixedUpdatable.GetType(), typeof(IFixedUpdatable));
+        Check_LifeScopeType_Match(typeof(IFixedUpdatable), fakeFixedUpdatable.GetType());
 
         var fixedDeltaTime = 0.02f;
 
@@ -57,7 +57,7 @@ public class ContainerLifeScopeTest
     {
         //arrange
         var fakeReleasable = Bind_And_Resolve(new FakeReleasable());
-        Check_LifeScope_Match(fakeReleasable.GetType(), typeof(IReleasable));
+        Check_LifeScopeType_Match(typeof(IReleasable), fakeReleasable.GetType());
 
         //act
         _container.RemoveRootObject<FakeReleasable>();
@@ -76,9 +76,9 @@ public class ContainerLifeScopeTest
         return registeredObject;
     }
 
-    private void Check_LifeScope_Match(Type registeredObjectType, Type exceptedType)
+    private void Check_LifeScopeType_Match(Type exceptedType, Type rootObjectType)
     {
-        _container.TryGetLifeScopeTypes(registeredObjectType, out var lifeScopeTypes);
+        _container.TryGetLifeScopeTypes(rootObjectType, out var lifeScopeTypes);
         var lifeScopeType = lifeScopeTypes[0];
         Assert.AreEqual(exceptedType, lifeScopeType,
             $"LifeScope is not match. ExceptedType: {exceptedType}, lifeScopeType: {lifeScopeType}.");

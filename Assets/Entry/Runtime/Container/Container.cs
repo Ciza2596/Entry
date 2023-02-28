@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Object = System.Object;
 
 
 namespace Entry
@@ -24,42 +25,58 @@ namespace Entry
         //Unity callback
         public void Update(float deltaTime) =>
             _updateHandle?.Invoke(deltaTime);
-        
+
         public void FixedUpdate(float fixedDeltaTime) =>
             _fixedUpdateHandle?.Invoke(fixedDeltaTime);
 
-        
+
+        //public variable
+        public Type[] RootObjectTypes => _rootObjectDataMap.Keys.ToArray();
+        public Type[] RegisteredObjectTypes => _rootObjectTypeMap.Keys.ToArray();
+
 
         //public method
-        public Type[] GetRootObjectTypes() => _rootObjectDataMap.Keys.ToArray();
-        public Type[] GetRegisteredObjectTypes() => _rootObjectTypeMap.Keys.ToArray();
+        public bool TryGetRootObjectType(Type registeredObjectType, out Type rootObjectType) =>
+            _rootObjectTypeMap.TryGetValue(registeredObjectType, out rootObjectType);
 
-        public Type[] GetRegisteredObjectTypes(Type rootObjectType)
+        public bool TryGetRegisteredObjectTypes(Type rootObjectType, out Type[] registeredTypes)
         {
-            var rootObjectData = _rootObjectDataMap[rootObjectType];
-            return rootObjectData.RegisteredTypes;
+            registeredTypes = null;
+
+            if (!_rootObjectDataMap.TryGetValue(rootObjectType, out var rootObjectData))
+                return false;
+
+            registeredTypes = rootObjectData.RegisteredTypes;
+            return true;
         }
 
         public bool TryGetLifeScopeTypes(Type rootObjectType, out Type[] lifeScopeTypes)
         {
-            var rootObjectData = _rootObjectDataMap[rootObjectType];
+            lifeScopeTypes = null;
+            if (!_rootObjectDataMap.TryGetValue(rootObjectType, out var rootObjectData))
+                return false;
+
             lifeScopeTypes = rootObjectData.LifeScopeTypes;
             return lifeScopeTypes != null && lifeScopeTypes.Length > 0;
         }
 
+
         public void Bind<TRootObject>(TRootObject rootObject) where TRootObject : class =>
             Bind<TRootObject, TRootObject>(rootObject);
 
-        
+
         public void Bind<TRegisteredObject, TRootObject>(TRootObject rootObject)
             where TRegisteredObject : class where TRootObject : class =>
             Bind(typeof(TRegisteredObject), rootObject);
 
         public void BindAndSelf<TRegisteredObject, TRootObject>(TRootObject rootObject)
-            where TRegisteredObject : class where TRootObject : class =>
-            Bind(typeof(TRegisteredObject), rootObject, true);
+            where TRegisteredObject : class where TRootObject : class
+        {
+            var registeredTypes = new[] { typeof(TRegisteredObject), typeof(TRootObject) };
+            foreach (var canBeRegisteredType in registeredTypes)
+                Bind(canBeRegisteredType, rootObject);
+        }
 
-        
         public void BindInheritances<TRootObject>(TRootObject rootObject) where TRootObject : class
         {
             var rootObjectType = typeof(TRootObject);
@@ -72,10 +89,10 @@ namespace Entry
         public void BindInheritancesAndSelf<TRootObject>(TRootObject rootObject) where TRootObject : class
         {
             var rootObjectType = typeof(TRootObject);
-            var canBeRegisteredTypes = GetCanBeRegisteredTypes(rootObjectType);
+            var canBeRegisteredTypes = GetCanBeRegisteredTypes(rootObjectType, true);
 
             foreach (var canBeRegisteredType in canBeRegisteredTypes)
-                Bind(canBeRegisteredType, rootObject, true);
+                Bind(canBeRegisteredType, rootObject);
         }
 
 
@@ -128,10 +145,10 @@ namespace Entry
 
         public void RemoveRootObject<TRegisteredType>() where TRegisteredType : class =>
             RemoveRootObject(typeof(TRegisteredType));
-        
+
         public void RemoveRootObject(Type registeredType) =>
             RemoveRootObjectByRegisteredObjectType(registeredType);
-        
+
         public void RemoveAllRootObjects()
         {
             var rootObjectTypes = _rootObjectDataMap.Keys.ToArray();
@@ -139,11 +156,9 @@ namespace Entry
                 RemoveRootObjectByRootObjectType(rootObjectType);
         }
 
-        
-        
 
         //private method
-        private void Bind<TRootObject>(Type registeredType, TRootObject rootObject, bool isBindSelf = false)
+        private void Bind<TRootObject>(Type registeredType, TRootObject rootObject)
         {
             var rootObjectType = rootObject.GetType();
 
@@ -164,21 +179,15 @@ namespace Entry
             var rootObjectData = _rootObjectDataMap[rootObjectType];
             rootObjectData.AddRegisteredType(registeredType);
             _rootObjectTypeMap.Add(registeredType, rootObjectType);
-
-            if (isBindSelf && !_rootObjectTypeMap.ContainsKey(rootObjectType))
-            {
-                rootObjectData.AddRegisteredType(rootObjectType);
-                _rootObjectTypeMap.Add(rootObjectType, rootObjectType);
-            }
         }
 
         private bool CheckCanBeRegisteredType(Type registeredType, Type rootObjectType)
         {
-            var canBeRegisteredTypes = GetCanBeRegisteredTypes(rootObjectType);
+            var canBeRegisteredTypes = GetCanBeRegisteredTypes(rootObjectType, true);
             return canBeRegisteredTypes.Contains(registeredType);
         }
-        
-        private Type[] GetCanBeRegisteredTypes(Type rootObjectType)
+
+        private Type[] GetCanBeRegisteredTypes(Type rootObjectType, bool isIncludeSelf = false)
         {
             var rootObjectInterfaces = rootObjectType.GetInterfaces().ToList();
 
@@ -186,10 +195,12 @@ namespace Entry
                 if (_lifeScopeTypes.Contains(rootObjectInterface))
                     rootObjectInterfaces.Remove(rootObjectInterface);
 
-            rootObjectInterfaces.Add(rootObjectType);
-
             var rootObjectBaseType = rootObjectType.BaseType;
-            rootObjectInterfaces.Add(rootObjectBaseType);
+            if (rootObjectBaseType != typeof(Object))
+                rootObjectInterfaces.Add(rootObjectBaseType);
+
+            if (isIncludeSelf)
+                rootObjectInterfaces.Add(rootObjectType);
 
             return rootObjectInterfaces.ToArray();
         }
@@ -233,7 +244,7 @@ namespace Entry
             if (rootObject is IFixedUpdatable fixedUpdatable)
                 _fixedUpdateHandle -= fixedUpdatable.FixedUpdate;
         }
-        
+
         private void RemoveRootObjectByRootObjectType(Type rootObjectType)
         {
             if (!_rootObjectDataMap.TryGetValue(rootObjectType, out var rootObjectData))
