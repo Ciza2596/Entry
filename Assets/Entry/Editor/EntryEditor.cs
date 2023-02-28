@@ -8,10 +8,12 @@ namespace Entry.Editor
 {
     public class EntryEditor : EditorWindow
     {
+        private const string SPACE = "  ";
+
         private Vector3 _scrollPosition;
-        
+
         //private method
-        [MenuItem("Tools/CizaModule/Entry")]
+        [MenuItem("Tools/CizaModule/Entry",priority = -200)]
         private static void ShowWindow() =>
             GetWindow<EntryEditor>("Entry");
 
@@ -29,16 +31,16 @@ namespace Entry.Editor
         private void ShowDetail()
         {
             var rootObjectTypes = Entry.RootObjectTypes;
-            
+
             EditorGUILayout.BeginHorizontal();
-            
+
             ShowNumber(rootObjectTypes);
             ShowRootObject(rootObjectTypes);
             ShowUpdatable(rootObjectTypes);
             ShowFixedUpdatable(rootObjectTypes);
             ShowReleasable(rootObjectTypes);
             ShowRegisteredObjectTypes(rootObjectTypes);
-            
+
             EditorGUILayout.EndHorizontal();
         }
 
@@ -65,28 +67,28 @@ namespace Entry.Editor
 
         private void ShowUpdatable(Type[] rootObjectTypes)
         {
-            var width = GUILayout.Width(65);
+            var width = GUILayout.Width(60);
             ShowVerticalInfo("Updatable", () =>
             {
                 foreach (var rootObjectType in rootObjectTypes)
                 {
                     Entry.TryGetLifeScopeTypes(rootObjectType, out var lifeScopeTypes);
                     var tip = lifeScopeTypes.Contains(typeof(IUpdatable)) ? "O" : "x";
-                    EditorGUILayout.LabelField(tip, width);
+                    EditorGUILayout.LabelField(SPACE + tip, width);
                 }
             }, width);
         }
 
         private void ShowFixedUpdatable(Type[] rootObjectTypes)
         {
-            var width = GUILayout.Width(80);
+            var width = GUILayout.Width(90);
             ShowVerticalInfo("FixedUpdatable", () =>
             {
                 foreach (var rootObjectType in rootObjectTypes)
                 {
                     Entry.TryGetLifeScopeTypes(rootObjectType, out var lifeScopeTypes);
                     var tip = lifeScopeTypes.Contains(typeof(IFixedUpdatable)) ? "O" : "x";
-                    EditorGUILayout.LabelField(tip, width);
+                    EditorGUILayout.LabelField(SPACE + tip, width);
                 }
             }, width);
         }
@@ -100,7 +102,7 @@ namespace Entry.Editor
                 {
                     Entry.TryGetLifeScopeTypes(rootObjectType, out var lifeScopeTypes);
                     var tip = lifeScopeTypes.Contains(typeof(IReleasable)) ? "O" : "x";
-                    EditorGUILayout.LabelField(tip, width);
+                    EditorGUILayout.LabelField(SPACE + tip, width);
                 }
             }, width);
         }

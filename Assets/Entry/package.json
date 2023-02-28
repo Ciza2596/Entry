@@ -14,5 +14,12 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/Ciza2596/Entry.git"
-  }
+  },
+  "samples": [
+    {
+      "displayName": "Example1 HowToUseEntry",
+      "description": "using entry examples.",
+      "path": "Samples~/Example1 HowToUseEntry"
+    }
+  ]
 }
