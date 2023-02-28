@@ -8,6 +8,7 @@ namespace Entry
         //private variable
         private Action<float> _updateCallback;
         private Action<float> _fixedUpdateCallback;
+        private Action _applicationQuit;
 
         
 
@@ -20,7 +21,7 @@ namespace Entry
 
 
         private void OnApplicationQuit() =>
-            Entry.Release();
+            _applicationQuit?.Invoke();
         
 
 
@@ -30,6 +31,10 @@ namespace Entry
 
         public void SetFixedUpdateCallback(Action<float> fixedUpdateCallback) =>
             _fixedUpdateCallback = fixedUpdateCallback;
+        
+        public void SetApplicationQuit(Action applicationQuit) =>
+            _applicationQuit = applicationQuit;
+        
 
         public void RemoveCallback()
         {

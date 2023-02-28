@@ -10,7 +10,7 @@ namespace Entry
     public class Container
     {
         //private variable
-        private readonly IReadOnlyList<Type> _cantBeRegisteredTypes = new List<Type>(3)
+        private readonly IReadOnlyList<Type> _lifeScopeTypes = new List<Type>(3)
             { typeof(IUpdatable), typeof(IFixedUpdatable), typeof(IReleasable) };
 
 
@@ -40,16 +40,17 @@ namespace Entry
             return rootObjectData.RegisteredTypes;
         }
 
-        public bool TryGetGameLoopObjectTypes(Type rootObjectType, out Type[] gameLoopTypes)
+        public bool TryGetLifeScopeTypes(Type rootObjectType, out Type[] lifeScopeTypes)
         {
             var rootObjectData = _rootObjectDataMap[rootObjectType];
-            gameLoopTypes = rootObjectData.GameLoopTypes;
-            return gameLoopTypes != null && gameLoopTypes.Length > 0;
+            lifeScopeTypes = rootObjectData.LifeScopeTypes;
+            return lifeScopeTypes != null && lifeScopeTypes.Length > 0;
         }
 
         public void Bind<TRootObject>(TRootObject rootObject) where TRootObject : class =>
             Bind<TRootObject, TRootObject>(rootObject);
 
+        
         public void Bind<TRegisteredObject, TRootObject>(TRootObject rootObject)
             where TRegisteredObject : class where TRootObject : class =>
             Bind(typeof(TRegisteredObject), rootObject);
@@ -58,6 +59,7 @@ namespace Entry
             where TRegisteredObject : class where TRootObject : class =>
             Bind(typeof(TRegisteredObject), rootObject, true);
 
+        
         public void BindInheritances<TRootObject>(TRootObject rootObject) where TRootObject : class
         {
             var rootObjectType = typeof(TRootObject);
@@ -83,7 +85,7 @@ namespace Entry
             registeredObject = null;
 
             var registeredObjectType = typeof(TRegisteredObject);
-            Assert.IsTrue(!_cantBeRegisteredTypes.Contains(registeredObjectType),
+            Assert.IsTrue(!_lifeScopeTypes.Contains(registeredObjectType),
                 $"[Container::TryResolve] Cant use registeredObjectType: {registeredObjectType}.");
 
             if (!_rootObjectTypeMap.TryGetValue(registeredObjectType, out var rootObjectType))
@@ -101,6 +103,9 @@ namespace Entry
             return true;
         }
 
+
+        public void Remove<TRegisteredType>() where TRegisteredType : class =>
+            Remove(typeof(TRegisteredType));
 
         public void Remove(Type registeredType)
         {
@@ -121,6 +126,9 @@ namespace Entry
             RemoveRootObjectByRootObjectType(rootObjectType);
         }
 
+        public void RemoveRootObject<TRegisteredType>() where TRegisteredType : class =>
+            RemoveRootObject(typeof(TRegisteredType));
+        
         public void RemoveRootObject(Type registeredType) =>
             RemoveRootObjectByRegisteredObjectType(registeredType);
         
@@ -175,7 +183,7 @@ namespace Entry
             var rootObjectInterfaces = rootObjectType.GetInterfaces().ToList();
 
             foreach (var rootObjectInterface in rootObjectInterfaces.ToArray())
-                if (_cantBeRegisteredTypes.Contains(rootObjectInterface))
+                if (_lifeScopeTypes.Contains(rootObjectInterface))
                     rootObjectInterfaces.Remove(rootObjectInterface);
 
             rootObjectInterfaces.Add(rootObjectType);
@@ -186,23 +194,23 @@ namespace Entry
             return rootObjectInterfaces.ToArray();
         }
 
-        private Type[] GetGameLoopTypes(Type rootObjectType)
+        private Type[] GetLifeScopeTypes(Type rootObjectType)
         {
             var rootObjectInterfaces = rootObjectType.GetInterfaces().ToList();
-            var gameLoopTypes = new List<Type>();
+            var lifeScopeTypes = new List<Type>();
 
             foreach (var rootObjectInterface in rootObjectInterfaces.ToArray())
-                if (_cantBeRegisteredTypes.Contains(rootObjectInterface))
-                    gameLoopTypes.Add(rootObjectInterface);
+                if (_lifeScopeTypes.Contains(rootObjectInterface))
+                    lifeScopeTypes.Add(rootObjectInterface);
 
-            return gameLoopTypes.ToArray();
+            return lifeScopeTypes.ToArray();
         }
 
         private void CreateRootObjectData<TRootObject>(TRootObject rootObject)
         {
             var rootObjectType = rootObject.GetType();
-            var gameLoopTypes = GetGameLoopTypes(rootObjectType);
-            var rootObjectData = new RootObjectData(rootObject, gameLoopTypes);
+            var lifeScopeTypes = GetLifeScopeTypes(rootObjectType);
+            var rootObjectData = new RootObjectData(rootObject, lifeScopeTypes);
             _rootObjectDataMap.Add(rootObjectType, rootObjectData);
 
             AddUpdateAndFixedUpdate(rootObject);

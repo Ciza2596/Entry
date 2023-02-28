@@ -24,22 +24,27 @@ namespace Entry
 
             _entryUpdateComponent.SetUpdateCallback(_container.Update);
             _entryUpdateComponent.SetFixedUpdateCallback(_container.FixedUpdate);
+            _entryUpdateComponent.SetApplicationQuit(Release);
         }
-
-
+        
         public static void Release()
         {
+            if(!IsInitialized)
+                return;
+            
             _container.RemoveAllRootObjects();
-            _entryUpdateComponent.RemoveCallback();
-
             _container = null;
-
+            
+            
+            _entryUpdateComponent.RemoveCallback();
+            
             var entryUpdateComponent = _entryUpdateComponent;
             _entryUpdateComponent = null;
 
             Object.Destroy(entryUpdateComponent.gameObject);
         }
 
+        
 
         public static void Bind<TRootObject>(TRootObject rootObject) where TRootObject : class
         {
@@ -49,6 +54,8 @@ namespace Entry
             _container.Bind(rootObject);
         }
 
+        
+        
         public static void Bind<TRegisteredObject, TRootObject>(TRootObject rootObject)
             where TRegisteredObject : class where TRootObject : class
         {
@@ -57,7 +64,37 @@ namespace Entry
 
             _container.Bind<TRegisteredObject, TRootObject>(rootObject);
         }
+        
+        public static void BindAndSelf<TRegisteredObject, TRootObject>(TRootObject rootObject)
+            where TRegisteredObject : class where TRootObject : class
+        {
+            if (CheckIsNotInitialized())
+                return;
 
+            _container.BindAndSelf<TRegisteredObject, TRootObject>(rootObject);
+        }
+
+        
+
+        public static void BindInheritances<TRootObject>(TRootObject rootObject) where TRootObject : class
+        {
+            if (CheckIsNotInitialized())
+                return;
+            
+            _container.BindInheritances(rootObject);
+        }
+
+        public static void BindInheritancesAndSelf<TRootObject>(TRootObject rootObject) where TRootObject : class
+        {
+            if (CheckIsNotInitialized())
+                return;
+            
+            _container.BindInheritancesAndSelf(rootObject);
+        }
+
+        
+        
+        
         public static bool TryResolve<TRegisteredObject>(out TRegisteredObject registeredObject) where TRegisteredObject : class
         {
             registeredObject = null;
@@ -67,12 +104,22 @@ namespace Entry
             return _container.TryResolve(out registeredObject);
         }
 
+        
+        
         public static void Remove(Type registeredType)
         {
             if (CheckIsNotInitialized())
                 return;
 
             _container.Remove(registeredType);
+        }
+
+        public static void RemoveRootObject(Type registeredType)
+        {
+            if (CheckIsNotInitialized())
+                return;
+
+            _container.RemoveRootObject(registeredType);
         }
 
         public static void RemoveAllRootObjects()
