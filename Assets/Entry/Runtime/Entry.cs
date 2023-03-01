@@ -20,6 +20,12 @@ namespace Entry
         //public method
         public static void Initialize()
         {
+            if (IsInitialized)
+            {
+                Debug.LogWarning("[Entry::Release] Entry is already Initialized.");
+                return;
+            }
+
             _container = new Container();
 
             var entry = new GameObject(nameof(Entry));
@@ -34,7 +40,10 @@ namespace Entry
         public static void Release()
         {
             if (!IsInitialized)
-                return;
+            {
+                Debug.LogWarning("[Entry::Release] Entry is already released.");
+                return;   
+            }
 
             _container.RemoveAllRootObjects();
             _container = null;
