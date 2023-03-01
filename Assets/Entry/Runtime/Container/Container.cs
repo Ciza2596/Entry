@@ -272,7 +272,8 @@ namespace Entry
 
         private void RemoveRootObjectByRegisteredObjectType(Type registeredObjectType)
         {
-            Assert.IsTrue(_rootObjectTypeMap.TryGetValue(registeredObjectType, out var rootObjectType),
+            var hasValue = _rootObjectTypeMap.TryGetValue(registeredObjectType, out var rootObjectType);
+            Assert.IsTrue(hasValue,
                 $"[Container::RemoveRootObjectByRegisteredObjectType] RegisteredObjectType: {registeredObjectType} is already removed.");
 
             RemoveRootObjectByRootObjectType(rootObjectType);
