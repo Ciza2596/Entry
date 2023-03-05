@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 
-public class ContainerTest
+public class EntryContainerTest
 {
     private Entry.EntryContainer _entryContainer;
 
