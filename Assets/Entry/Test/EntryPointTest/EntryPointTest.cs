@@ -4,19 +4,19 @@ using NUnit.Framework;
 
 public class LifeScopeTest
 {
-    private Container _container;
+    private EntryContainer _entryContainer;
 
     [SetUp]
     public void SetUp()
     {
-        _container = new Container();
+        _entryContainer = new EntryContainer();
     }
 
     [TearDown]
     public void TearDown()
     {
-        _container.RemoveAllRootObjects();
-        _container = null;
+        _entryContainer.RemoveAllRootObjects();
+        _entryContainer = null;
     }
 
 
@@ -30,7 +30,7 @@ public class LifeScopeTest
         var deltaTime = 0.02f;
 
         //act
-        _container.Tick(deltaTime);
+        _entryContainer.Tick(deltaTime);
 
         //assert
         Assert.AreEqual(deltaTime.ToString(), fakeUpdatable.Result, "DeltaTime doesnt match.");
@@ -46,7 +46,7 @@ public class LifeScopeTest
         var fixedDeltaTime = 0.02f;
 
         //act
-        _container.FixedTick(fixedDeltaTime);
+        _entryContainer.FixedTick(fixedDeltaTime);
 
         //assert
         Assert.AreEqual(fixedDeltaTime.ToString(), fakeFixedUpdatable.Result, "FixedDeltaTime doesnt match.");
@@ -60,7 +60,7 @@ public class LifeScopeTest
         Check_EntryPointType_Match(typeof(IReleasable), fakeReleasable.GetType());
 
         //act
-        _container.RemoveRootObject<FakeReleasable>();
+        _entryContainer.RemoveRootObject<FakeReleasable>();
 
         //assert
         Assert.IsTrue(!string.IsNullOrWhiteSpace(fakeReleasable.Result), "The object doesnt release.");
@@ -70,15 +70,15 @@ public class LifeScopeTest
     //private method
     private TRootObject Bind_And_Resolve<TRootObject>(TRootObject rootObject) where TRootObject : class
     {
-        _container.Bind(rootObject);
-        _container.TryResolve<TRootObject>(out var registeredObject);
+        _entryContainer.Bind(rootObject);
+        _entryContainer.TryResolve<TRootObject>(out var registeredObject);
 
         return registeredObject;
     }
 
     private void Check_EntryPointType_Match(Type exceptedType, Type rootObjectType)
     {
-        _container.TryGetEntryPointTypes(rootObjectType, out var lifeScopeTypes);
+        _entryContainer.TryGetEntryPointTypes(rootObjectType, out var lifeScopeTypes);
         var lifeScopeType = lifeScopeTypes[0];
         Assert.AreEqual(exceptedType, lifeScopeType,
             $"LifeScope is not match. ExceptedType: {exceptedType}, lifeScopeType: {lifeScopeType}.");

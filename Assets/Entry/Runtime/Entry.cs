@@ -7,14 +7,14 @@ namespace Entry
     public static class Entry
     {
         //private variable
-        private static Container _container;
+        private static EntryContainer _entryContainer;
         private static EntryComponent _entryComponent;
 
 
         //public variable
-        public static bool IsInitialized => _container != null && _entryComponent != null;
-        public static Type[] RootObjectTypes => CheckIsNotInitialized() ? null : _container.RootObjectTypes;
-        public static Type[] RegisteredObjectTypes => CheckIsNotInitialized() ? null : _container.RegisteredObjectTypes;
+        public static bool IsInitialized => _entryContainer != null && _entryComponent != null;
+        public static Type[] RootObjectTypes => CheckIsNotInitialized() ? null : _entryContainer.RootObjectTypes;
+        public static Type[] RegisteredObjectTypes => CheckIsNotInitialized() ? null : _entryContainer.RegisteredObjectTypes;
 
         
         //public method
@@ -26,14 +26,14 @@ namespace Entry
                 return;
             }
 
-            _container = new Container();
+            _entryContainer = new EntryContainer();
 
             var entry = new GameObject(nameof(Entry));
             Object.DontDestroyOnLoad(entry);
             _entryComponent = entry.AddComponent<EntryComponent>();
 
-            _entryComponent.SetUpdateCallback(_container.Tick);
-            _entryComponent.SetFixedUpdateCallback(_container.FixedTick);
+            _entryComponent.SetUpdateCallback(_entryContainer.Tick);
+            _entryComponent.SetFixedUpdateCallback(_entryContainer.FixedTick);
             _entryComponent.SetApplicationQuit(Release);
         }
 
@@ -45,8 +45,8 @@ namespace Entry
                 return;   
             }
 
-            _container.RemoveAllRootObjects();
-            _container = null;
+            _entryContainer.RemoveAllRootObjects();
+            _entryContainer = null;
 
 
             _entryComponent.RemoveCallback();
@@ -63,7 +63,7 @@ namespace Entry
             if (CheckIsNotInitialized())
                 return false;
             
-           return _container.TryGetRootObjectType(registeredObjectType, out rootObjectType);
+           return _entryContainer.TryGetRootObjectType(registeredObjectType, out rootObjectType);
         }
 
         public static bool TryGetRegisteredObjectTypes(Type rootObjectType, out Type[] registeredTypes)
@@ -72,7 +72,7 @@ namespace Entry
             if (CheckIsNotInitialized())
                 return false;
             
-            return _container.TryGetRegisteredObjectTypes(rootObjectType, out registeredTypes);
+            return _entryContainer.TryGetRegisteredObjectTypes(rootObjectType, out registeredTypes);
         }
 
         public static bool TryGetEntryPointTypes(Type rootObjectType, out Type[] entryPointTypes)
@@ -81,7 +81,7 @@ namespace Entry
             if (CheckIsNotInitialized())
                 return false;
             
-            return _container.TryGetEntryPointTypes(rootObjectType, out entryPointTypes);
+            return _entryContainer.TryGetEntryPointTypes(rootObjectType, out entryPointTypes);
         }
 
 
@@ -91,7 +91,7 @@ namespace Entry
             if (CheckIsNotInitialized())
                 return;
 
-            _container.Bind(rootObject);
+            _entryContainer.Bind(rootObject);
         }
 
 
@@ -101,7 +101,7 @@ namespace Entry
             if (CheckIsNotInitialized())
                 return;
 
-            _container.Bind<TRegisteredObject, TRootObject>(rootObject);
+            _entryContainer.Bind<TRegisteredObject, TRootObject>(rootObject);
         }
 
         public static void BindAndSelf<TRegisteredObject, TRootObject>(TRootObject rootObject)
@@ -110,7 +110,7 @@ namespace Entry
             if (CheckIsNotInitialized())
                 return;
 
-            _container.BindAndSelf<TRegisteredObject, TRootObject>(rootObject);
+            _entryContainer.BindAndSelf<TRegisteredObject, TRootObject>(rootObject);
         }
 
 
@@ -119,7 +119,7 @@ namespace Entry
             if (CheckIsNotInitialized())
                 return;
 
-            _container.BindInheritances(rootObject);
+            _entryContainer.BindInheritances(rootObject);
         }
 
         public static void BindInheritancesAndSelf<TRootObject>(TRootObject rootObject) where TRootObject : class
@@ -127,7 +127,7 @@ namespace Entry
             if (CheckIsNotInitialized())
                 return;
 
-            _container.BindInheritancesAndSelf(rootObject);
+            _entryContainer.BindInheritancesAndSelf(rootObject);
         }
 
 
@@ -138,7 +138,7 @@ namespace Entry
             if (CheckIsNotInitialized())
                 return false;
 
-            return _container.TryResolve(out registeredObject);
+            return _entryContainer.TryResolve(out registeredObject);
         }
 
 
@@ -147,7 +147,7 @@ namespace Entry
             if (CheckIsNotInitialized())
                 return;
 
-            _container.Remove(registeredType);
+            _entryContainer.Remove(registeredType);
         }
 
         public static void RemoveRootObject(Type registeredType)
@@ -155,7 +155,7 @@ namespace Entry
             if (CheckIsNotInitialized())
                 return;
 
-            _container.RemoveRootObject(registeredType);
+            _entryContainer.RemoveRootObject(registeredType);
         }
 
         public static void RemoveAllRootObjects()
@@ -163,7 +163,7 @@ namespace Entry
             if (CheckIsNotInitialized())
                 return;
 
-            _container.RemoveAllRootObjects();
+            _entryContainer.RemoveAllRootObjects();
         }
 
 

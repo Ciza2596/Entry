@@ -8,7 +8,7 @@ using Object = System.Object;
 
 namespace Entry
 {
-    public class Container
+    public class EntryContainer
     {
         //private variable
         private readonly IReadOnlyList<Type> _entryPointTypes = new List<Type>(3)
@@ -103,12 +103,12 @@ namespace Entry
 
             var registeredObjectType = typeof(TRegisteredObject);
             Assert.IsTrue(!_entryPointTypes.Contains(registeredObjectType),
-                $"[Container::TryResolve] Cant use registeredObjectType: {registeredObjectType}.");
+                $"[EntryContainer::TryResolve] Cant use registeredObjectType: {registeredObjectType}.");
 
             if (!_rootObjectTypeMap.TryGetValue(registeredObjectType, out var rootObjectType))
             {
                 Debug.LogWarning(
-                    $"[Container::TryResolve] Not find registeredObject by registeredObjectType: {registeredObjectType}.");
+                    $"[EntryContainer::TryResolve] Not find registeredObject by registeredObjectType: {registeredObjectType}.");
                 return false;
             }
 
@@ -128,7 +128,7 @@ namespace Entry
         {
             if (!_rootObjectTypeMap.TryGetValue(registeredType, out var rootObjectType))
             {
-                Debug.LogError($"[Container::Remove] RegisteredType: {registeredType} is already removed.");
+                Debug.LogError($"[EntryContainer::Remove] RegisteredType: {registeredType} is already removed.");
                 return;
             }
 
@@ -163,12 +163,12 @@ namespace Entry
             var rootObjectType = rootObject.GetType();
 
             Assert.IsTrue(CheckCanBeRegisteredType(registeredType, rootObjectType),
-                $"[Container::Bind] Please check rootObjectType: {rootObjectType} inherits registeredType: {registeredType}.");
+                $"[EntryContainer::Bind] Please check rootObjectType: {rootObjectType} inherits registeredType: {registeredType}.");
 
             if (_rootObjectTypeMap.TryGetValue(registeredType, out var currentRootObjectType))
             {
                 Debug.LogWarning(
-                    $"[Container::Bind] RegisteredType: {registeredType} is already registered. Current matching rootObjectType: {currentRootObjectType}");
+                    $"[EntryContainer::Bind] RegisteredType: {registeredType} is already registered. Current matching rootObjectType: {currentRootObjectType}");
                 return;
             }
 
@@ -224,10 +224,10 @@ namespace Entry
             var rootObjectData = new RootObjectData(rootObject, entryPointTypes);
             _rootObjectDataMap.Add(rootObjectType, rootObjectData);
 
-            AddUpdateAndFixedUpdateHandle(rootObject);
+            AddTickAndFixedTickHandle(rootObject);
         }
 
-        private void AddUpdateAndFixedUpdateHandle(object rootObject)
+        private void AddTickAndFixedTickHandle(object rootObject)
         {
             if (rootObject is ITickable updatable)
                 _tickHandle += updatable.Tick;
@@ -236,7 +236,7 @@ namespace Entry
                 _fixedTickHandle += fixedUpdatable.FixedTick;
         }
 
-        private void RemoveUpdateAndFixedUpdateHandle(object rootObject)
+        private void RemoveTickAndFixedTickHandle(object rootObject)
         {
             if (rootObject is ITickable updatable)
                 _tickHandle -= updatable.Tick;
@@ -250,12 +250,12 @@ namespace Entry
             if (!_rootObjectDataMap.TryGetValue(rootObjectType, out var rootObjectData))
             {
                 Debug.LogWarning(
-                    $"[Container::RemoveRootObjectByRootObjectType] RootObjectType: {rootObjectType} is already removed.");
+                    $"[EntryContainer::RemoveRootObjectByRootObjectType] RootObjectType: {rootObjectType} is already removed.");
                 return;
             }
 
             var rootObject = rootObjectData.RootObject;
-            RemoveUpdateAndFixedUpdateHandle(rootObject);
+            RemoveTickAndFixedTickHandle(rootObject);
 
             if (rootObject is IReleasable releasable)
                 releasable.Release();
@@ -274,7 +274,7 @@ namespace Entry
         {
             var hasValue = _rootObjectTypeMap.TryGetValue(registeredObjectType, out var rootObjectType);
             Assert.IsTrue(hasValue,
-                $"[Container::RemoveRootObjectByRegisteredObjectType] RegisteredObjectType: {registeredObjectType} is already removed.");
+                $"[EntryContainer::RemoveRootObjectByRegisteredObjectType] RegisteredObjectType: {registeredObjectType} is already removed.");
 
             RemoveRootObjectByRootObjectType(rootObjectType);
         }

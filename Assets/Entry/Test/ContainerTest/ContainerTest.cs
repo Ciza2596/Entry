@@ -4,19 +4,19 @@ using NUnit.Framework;
 
 public class ContainerTest
 {
-    private Entry.Container _container;
+    private Entry.EntryContainer _entryContainer;
 
     [SetUp]
     public void SetUp()
     {
-        _container = new Entry.Container();
+        _entryContainer = new Entry.EntryContainer();
     }
 
     [TearDown]
     public void TearDown()
     {
-        _container.RemoveAllRootObjects();
-        _container = null;
+        _entryContainer.RemoveAllRootObjects();
+        _entryContainer = null;
     }
 
 
@@ -27,7 +27,7 @@ public class ContainerTest
         var fakeRootObject = new FakeRootObject();
 
         //act
-        _container.Bind(fakeRootObject);
+        _entryContainer.Bind(fakeRootObject);
 
         //assert
         Check_RegisteredObjectTypes_Match(new[] { typeof(FakeRootObject) }, fakeRootObject.GetType());
@@ -40,7 +40,7 @@ public class ContainerTest
         var fakeRootObject = new FakeRootObject();
 
         //act
-        _container.Bind<IFakeRegisteredObject1>(fakeRootObject);
+        _entryContainer.Bind<IFakeRegisteredObject1>(fakeRootObject);
 
 
         //assert
@@ -54,7 +54,7 @@ public class ContainerTest
         var fakeRootObject = new FakeRootObject();
 
         //act
-        _container.BindAndSelf<IFakeRegisteredObject1, FakeRootObject>(fakeRootObject);
+        _entryContainer.BindAndSelf<IFakeRegisteredObject1, FakeRootObject>(fakeRootObject);
 
         //assert
         Check_RegisteredObjectTypes_Match(new[] { typeof(IFakeRegisteredObject1), typeof(FakeRootObject) },
@@ -68,7 +68,7 @@ public class ContainerTest
         var fakeRootObject = new FakeRootObject();
 
         //act
-        _container.BindInheritances(fakeRootObject);
+        _entryContainer.BindInheritances(fakeRootObject);
 
         //assert
         Check_RegisteredObjectTypes_Match(new[] { typeof(IFakeRegisteredObject1), typeof(IFakeRegisteredObject2) },
@@ -82,7 +82,7 @@ public class ContainerTest
         var fakeRootObject = new FakeRootObject();
 
         //act
-        _container.BindInheritancesAndSelf(fakeRootObject);
+        _entryContainer.BindInheritancesAndSelf(fakeRootObject);
 
         //assert
         Check_RegisteredObjectTypes_Match(
@@ -96,10 +96,10 @@ public class ContainerTest
     {
         //arrange 
         var fakeRootObject = new FakeRootObject();
-        _container.Bind<IFakeRegisteredObject1>(fakeRootObject);
+        _entryContainer.Bind<IFakeRegisteredObject1>(fakeRootObject);
 
         //act
-        _container.TryResolve<IFakeRegisteredObject1>(out var fakeRegisteredObject);
+        _entryContainer.TryResolve<IFakeRegisteredObject1>(out var fakeRegisteredObject);
 
         //assert
         Assert.True(fakeRegisteredObject is FakeRootObject, "Resolve fail. Please check registerObject.");
@@ -110,10 +110,10 @@ public class ContainerTest
     {
         //arrange
         var fakeRootObject = new FakeRootObject();
-        _container.BindInheritancesAndSelf(fakeRootObject);
+        _entryContainer.BindInheritancesAndSelf(fakeRootObject);
 
         //act
-        _container.Remove<IFakeRegisteredObject1>();
+        _entryContainer.Remove<IFakeRegisteredObject1>();
 
         //assert
         Check_RegisteredObjectTypes_Match(new[] { typeof(IFakeRegisteredObject2), typeof(FakeRootObject) },
@@ -125,13 +125,13 @@ public class ContainerTest
     {
         //arrange
         var fakeRootObject = new FakeRootObject();
-        _container.BindInheritancesAndSelf(fakeRootObject);
+        _entryContainer.BindInheritancesAndSelf(fakeRootObject);
 
         //act
-        _container.RemoveRootObject<IFakeRegisteredObject1>();
+        _entryContainer.RemoveRootObject<IFakeRegisteredObject1>();
 
         //assert
-        Assert.AreEqual(0, _container.RootObjectTypes.Length, "Doesnt remove rootObject.");
+        Assert.AreEqual(0, _entryContainer.RootObjectTypes.Length, "Doesnt remove rootObject.");
     }
     
     
@@ -140,20 +140,20 @@ public class ContainerTest
     {
         //arrange
         var fakeRootObject = new FakeRootObject();
-        _container.BindInheritancesAndSelf(fakeRootObject);
+        _entryContainer.BindInheritancesAndSelf(fakeRootObject);
 
         //act
-        _container.RemoveAllRootObjects();
+        _entryContainer.RemoveAllRootObjects();
 
         //assert
-        Assert.AreEqual(0, _container.RootObjectTypes.Length, "Doesnt remove rootObject.");
+        Assert.AreEqual(0, _entryContainer.RootObjectTypes.Length, "Doesnt remove rootObject.");
     }
 
 
     //private method
     private void Check_RegisteredObjectTypes_Match(Type[] exceptedTypes, Type rootObjectType)
     {
-        _container.TryGetRegisteredObjectTypes(rootObjectType, out var registeredObjectTypes);
+        _entryContainer.TryGetRegisteredObjectTypes(rootObjectType, out var registeredObjectTypes);
 
         foreach (var registeredObjectType in registeredObjectTypes)
             Assert.IsTrue(exceptedTypes.Contains(registeredObjectType),
