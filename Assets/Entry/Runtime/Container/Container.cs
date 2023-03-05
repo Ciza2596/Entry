@@ -224,10 +224,10 @@ namespace Entry
             var rootObjectData = new RootObjectData(rootObject, lifeScopeTypes);
             _rootObjectDataMap.Add(rootObjectType, rootObjectData);
 
-            AddUpdateAndFixedUpdate(rootObject);
+            AddUpdateAndFixedUpdateHandle(rootObject);
         }
 
-        private void AddUpdateAndFixedUpdate(object rootObject)
+        private void AddUpdateAndFixedUpdateHandle(object rootObject)
         {
             if (rootObject is IUpdatable updatable)
                 _updateHandle += updatable.Update;
@@ -236,7 +236,7 @@ namespace Entry
                 _fixedUpdateHandle += fixedUpdatable.FixedUpdate;
         }
 
-        private void RemoveUpdateAndFixedUpdate(object rootObject)
+        private void RemoveUpdateAndFixedUpdateHandle(object rootObject)
         {
             if (rootObject is IUpdatable updatable)
                 _updateHandle -= updatable.Update;
@@ -255,7 +255,7 @@ namespace Entry
             }
 
             var rootObject = rootObjectData.RootObject;
-            RemoveUpdateAndFixedUpdate(rootObject);
+            RemoveUpdateAndFixedUpdateHandle(rootObject);
 
             if (rootObject is IReleasable releasable)
                 releasable.Release();
