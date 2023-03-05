@@ -24,13 +24,13 @@ public class LifeScopeTest
     public void _01_Updatable()
     {
         //arrange
-        var fakeUpdatable = Bind_And_Resolve(new FakeUpdatable());
-        Check_LifeScopeType_Match(typeof(IUpdatable), fakeUpdatable.GetType());
+        var fakeUpdatable = Bind_And_Resolve(new FakeTickable());
+        Check_EntryPointType_Match(typeof(ITickable), fakeUpdatable.GetType());
         
         var deltaTime = 0.02f;
 
         //act
-        _container.Update(deltaTime);
+        _container.Tick(deltaTime);
 
         //assert
         Assert.AreEqual(deltaTime.ToString(), fakeUpdatable.Result, "DeltaTime doesnt match.");
@@ -40,13 +40,13 @@ public class LifeScopeTest
     public void _02_FixedUpdatable()
     {
         //arrange
-        var fakeFixedUpdatable = Bind_And_Resolve(new FakeFixedUpdatable());
-        Check_LifeScopeType_Match(typeof(IFixedUpdatable), fakeFixedUpdatable.GetType());
+        var fakeFixedUpdatable = Bind_And_Resolve(new FakeFixedTickable());
+        Check_EntryPointType_Match(typeof(IFixedTickable), fakeFixedUpdatable.GetType());
 
         var fixedDeltaTime = 0.02f;
 
         //act
-        _container.FixedUpdate(fixedDeltaTime);
+        _container.FixedTick(fixedDeltaTime);
 
         //assert
         Assert.AreEqual(fixedDeltaTime.ToString(), fakeFixedUpdatable.Result, "FixedDeltaTime doesnt match.");
@@ -57,7 +57,7 @@ public class LifeScopeTest
     {
         //arrange
         var fakeReleasable = Bind_And_Resolve(new FakeReleasable());
-        Check_LifeScopeType_Match(typeof(IReleasable), fakeReleasable.GetType());
+        Check_EntryPointType_Match(typeof(IReleasable), fakeReleasable.GetType());
 
         //act
         _container.RemoveRootObject<FakeReleasable>();
@@ -76,9 +76,9 @@ public class LifeScopeTest
         return registeredObject;
     }
 
-    private void Check_LifeScopeType_Match(Type exceptedType, Type rootObjectType)
+    private void Check_EntryPointType_Match(Type exceptedType, Type rootObjectType)
     {
-        _container.TryGetLifeScopeTypes(rootObjectType, out var lifeScopeTypes);
+        _container.TryGetEntryPointTypes(rootObjectType, out var lifeScopeTypes);
         var lifeScopeType = lifeScopeTypes[0];
         Assert.AreEqual(exceptedType, lifeScopeType,
             $"LifeScope is not match. ExceptedType: {exceptedType}, lifeScopeType: {lifeScopeType}.");

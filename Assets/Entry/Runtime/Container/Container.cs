@@ -11,23 +11,23 @@ namespace Entry
     public class Container
     {
         //private variable
-        private readonly IReadOnlyList<Type> _lifeScopeTypes = new List<Type>(3)
-            { typeof(IUpdatable), typeof(IFixedUpdatable), typeof(IReleasable) };
+        private readonly IReadOnlyList<Type> _entryPointTypes = new List<Type>(3)
+            { typeof(ITickable), typeof(IFixedTickable), typeof(IReleasable) };
 
 
         private readonly Dictionary<Type, RootObjectData> _rootObjectDataMap = new Dictionary<Type, RootObjectData>();
         private readonly Dictionary<Type, Type> _rootObjectTypeMap = new Dictionary<Type, Type>();
 
-        private Action<float> _updateHandle;
-        private Action<float> _fixedUpdateHandle;
+        private Action<float> _tickHandle;
+        private Action<float> _fixedTickHandle;
 
 
         //Unity callback
-        public void Update(float deltaTime) =>
-            _updateHandle?.Invoke(deltaTime);
+        public void Tick(float deltaTime) =>
+            _tickHandle?.Invoke(deltaTime);
 
-        public void FixedUpdate(float fixedDeltaTime) =>
-            _fixedUpdateHandle?.Invoke(fixedDeltaTime);
+        public void FixedTick(float fixedDeltaTime) =>
+            _fixedTickHandle?.Invoke(fixedDeltaTime);
 
 
         //public variable
@@ -50,14 +50,14 @@ namespace Entry
             return true;
         }
 
-        public bool TryGetLifeScopeTypes(Type rootObjectType, out Type[] lifeScopeTypes)
+        public bool TryGetEntryPointTypes(Type rootObjectType, out Type[] entryPointTypes)
         {
-            lifeScopeTypes = null;
+            entryPointTypes = null;
             if (!_rootObjectDataMap.TryGetValue(rootObjectType, out var rootObjectData))
                 return false;
 
-            lifeScopeTypes = rootObjectData.LifeScopeTypes;
-            return lifeScopeTypes != null && lifeScopeTypes.Length > 0;
+            entryPointTypes = rootObjectData.EntryPointTypes;
+            return entryPointTypes != null && entryPointTypes.Length > 0;
         }
 
 
@@ -102,7 +102,7 @@ namespace Entry
             registeredObject = null;
 
             var registeredObjectType = typeof(TRegisteredObject);
-            Assert.IsTrue(!_lifeScopeTypes.Contains(registeredObjectType),
+            Assert.IsTrue(!_entryPointTypes.Contains(registeredObjectType),
                 $"[Container::TryResolve] Cant use registeredObjectType: {registeredObjectType}.");
 
             if (!_rootObjectTypeMap.TryGetValue(registeredObjectType, out var rootObjectType))
@@ -192,7 +192,7 @@ namespace Entry
             var rootObjectInterfaces = rootObjectType.GetInterfaces().ToList();
 
             foreach (var rootObjectInterface in rootObjectInterfaces.ToArray())
-                if (_lifeScopeTypes.Contains(rootObjectInterface))
+                if (_entryPointTypes.Contains(rootObjectInterface))
                     rootObjectInterfaces.Remove(rootObjectInterface);
 
             var rootObjectBaseType = rootObjectType.BaseType;
@@ -205,23 +205,23 @@ namespace Entry
             return rootObjectInterfaces.ToArray();
         }
 
-        private Type[] GetLifeScopeTypes(Type rootObjectType)
+        private Type[] GetEntryPointTypes(Type rootObjectType)
         {
             var rootObjectInterfaces = rootObjectType.GetInterfaces().ToList();
-            var lifeScopeTypes = new List<Type>();
+            var entryPointTypes = new List<Type>();
 
             foreach (var rootObjectInterface in rootObjectInterfaces.ToArray())
-                if (_lifeScopeTypes.Contains(rootObjectInterface))
-                    lifeScopeTypes.Add(rootObjectInterface);
+                if (_entryPointTypes.Contains(rootObjectInterface))
+                    entryPointTypes.Add(rootObjectInterface);
 
-            return lifeScopeTypes.ToArray();
+            return entryPointTypes.ToArray();
         }
 
         private void CreateRootObjectData<TRootObject>(TRootObject rootObject)
         {
             var rootObjectType = rootObject.GetType();
-            var lifeScopeTypes = GetLifeScopeTypes(rootObjectType);
-            var rootObjectData = new RootObjectData(rootObject, lifeScopeTypes);
+            var entryPointTypes = GetEntryPointTypes(rootObjectType);
+            var rootObjectData = new RootObjectData(rootObject, entryPointTypes);
             _rootObjectDataMap.Add(rootObjectType, rootObjectData);
 
             AddUpdateAndFixedUpdateHandle(rootObject);
@@ -229,20 +229,20 @@ namespace Entry
 
         private void AddUpdateAndFixedUpdateHandle(object rootObject)
         {
-            if (rootObject is IUpdatable updatable)
-                _updateHandle += updatable.Update;
+            if (rootObject is ITickable updatable)
+                _tickHandle += updatable.Tick;
 
-            if (rootObject is IFixedUpdatable fixedUpdatable)
-                _fixedUpdateHandle += fixedUpdatable.FixedUpdate;
+            if (rootObject is IFixedTickable fixedUpdatable)
+                _fixedTickHandle += fixedUpdatable.FixedTick;
         }
 
         private void RemoveUpdateAndFixedUpdateHandle(object rootObject)
         {
-            if (rootObject is IUpdatable updatable)
-                _updateHandle -= updatable.Update;
+            if (rootObject is ITickable updatable)
+                _tickHandle -= updatable.Tick;
 
-            if (rootObject is IFixedUpdatable fixedUpdatable)
-                _fixedUpdateHandle -= fixedUpdatable.FixedUpdate;
+            if (rootObject is IFixedTickable fixedUpdatable)
+                _fixedTickHandle -= fixedUpdatable.FixedTick;
         }
 
         private void RemoveRootObjectByRootObjectType(Type rootObjectType)

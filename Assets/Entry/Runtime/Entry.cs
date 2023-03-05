@@ -32,8 +32,8 @@ namespace Entry
             Object.DontDestroyOnLoad(entry);
             _entryComponent = entry.AddComponent<EntryComponent>();
 
-            _entryComponent.SetUpdateCallback(_container.Update);
-            _entryComponent.SetFixedUpdateCallback(_container.FixedUpdate);
+            _entryComponent.SetUpdateCallback(_container.Tick);
+            _entryComponent.SetFixedUpdateCallback(_container.FixedTick);
             _entryComponent.SetApplicationQuit(Release);
         }
 
@@ -75,13 +75,13 @@ namespace Entry
             return _container.TryGetRegisteredObjectTypes(rootObjectType, out registeredTypes);
         }
 
-        public static bool TryGetLifeScopeTypes(Type rootObjectType, out Type[] lifeScopeTypes)
+        public static bool TryGetEntryPointTypes(Type rootObjectType, out Type[] entryPointTypes)
         {
-            lifeScopeTypes = null;
+            entryPointTypes = null;
             if (CheckIsNotInitialized())
                 return false;
             
-            return _container.TryGetLifeScopeTypes(rootObjectType, out lifeScopeTypes);
+            return _container.TryGetEntryPointTypes(rootObjectType, out entryPointTypes);
         }
 
 

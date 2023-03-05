@@ -36,8 +36,8 @@ namespace Entry.Editor
 
             ShowNumber(rootObjectTypes);
             ShowRootObject(rootObjectTypes);
-            ShowUpdatable(rootObjectTypes);
-            ShowFixedUpdatable(rootObjectTypes);
+            ShowTickable(rootObjectTypes);
+            ShowFixedTickable(rootObjectTypes);
             ShowReleasable(rootObjectTypes);
             ShowRegisteredObjectTypes(rootObjectTypes);
 
@@ -65,29 +65,29 @@ namespace Entry.Editor
             }, width);
         }
 
-        private void ShowUpdatable(Type[] rootObjectTypes)
+        private void ShowTickable(Type[] rootObjectTypes)
         {
             var width = GUILayout.Width(60);
-            ShowVerticalInfo("Updatable", () =>
+            ShowVerticalInfo("Tickable", () =>
             {
                 foreach (var rootObjectType in rootObjectTypes)
                 {
-                    Entry.TryGetLifeScopeTypes(rootObjectType, out var lifeScopeTypes);
-                    var tip = lifeScopeTypes.Contains(typeof(IUpdatable)) ? "O" : "x";
+                    Entry.TryGetEntryPointTypes(rootObjectType, out var entryPointTypes);
+                    var tip = entryPointTypes.Contains(typeof(ITickable)) ? "O" : "x";
                     EditorGUILayout.LabelField(SPACE + tip, width);
                 }
             }, width);
         }
 
-        private void ShowFixedUpdatable(Type[] rootObjectTypes)
+        private void ShowFixedTickable(Type[] rootObjectTypes)
         {
             var width = GUILayout.Width(90);
-            ShowVerticalInfo("FixedUpdatable", () =>
+            ShowVerticalInfo("FixedTickable", () =>
             {
                 foreach (var rootObjectType in rootObjectTypes)
                 {
-                    Entry.TryGetLifeScopeTypes(rootObjectType, out var lifeScopeTypes);
-                    var tip = lifeScopeTypes.Contains(typeof(IFixedUpdatable)) ? "O" : "x";
+                    Entry.TryGetEntryPointTypes(rootObjectType, out var entryPointTypes);
+                    var tip = entryPointTypes.Contains(typeof(IFixedTickable)) ? "O" : "x";
                     EditorGUILayout.LabelField(SPACE + tip, width);
                 }
             }, width);
@@ -100,8 +100,8 @@ namespace Entry.Editor
             {
                 foreach (var rootObjectType in rootObjectTypes)
                 {
-                    Entry.TryGetLifeScopeTypes(rootObjectType, out var lifeScopeTypes);
-                    var tip = lifeScopeTypes.Contains(typeof(IReleasable)) ? "O" : "x";
+                    Entry.TryGetEntryPointTypes(rootObjectType, out var entryPointTypes);
+                    var tip = entryPointTypes.Contains(typeof(IReleasable)) ? "O" : "x";
                     EditorGUILayout.LabelField(SPACE + tip, width);
                 }
             }, width);

@@ -6,21 +6,21 @@ namespace Entry
 {
     public class RootObjectData
     {
-        private readonly Type[] _lifeScopeTypes;
+        private readonly Type[] _entryPointTypes;
         private readonly List<Type> _registeredTypes = new List<Type>();
 
         //public variable
         public object RootObject { get; }
-        public Type[] LifeScopeTypes => _lifeScopeTypes.ToArray();
+        public Type[] EntryPointTypes => _entryPointTypes.ToArray();
         public int RegisteredTypeCount => _registeredTypes.Count;
         public Type[] RegisteredTypes => _registeredTypes.ToArray();
 
 
         //constructor
-        public RootObjectData(object rootObject, Type[] lifeScopeTypes)
+        public RootObjectData(object rootObject, Type[] entryPointTypes)
         {
             RootObject = rootObject;
-            _lifeScopeTypes = lifeScopeTypes;
+            _entryPointTypes = entryPointTypes;
         }
 
 
