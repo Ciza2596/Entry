@@ -2,13 +2,13 @@
 
 namespace Entry.Example1
 {
-    public class CombatModule : IUpdatable, IFixedUpdatable, IReleasable, ICombatModule
+    public class CombatModule : ITickable, IFixedTickable, IReleasable, ICombatModule
     {
-        public void Update(float deltaTime)
+        public void Tick(float deltaTime)
         {
         }
 
-        public void FixedUpdate(float fixedDeltaTime)
+        public void FixedTick(float fixedDeltaTime)
         {
         }
 
