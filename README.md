@@ -137,8 +137,73 @@ public class InitializeGame : MonoBehaviour
 
 ## EntryPoint
 
-- 
+Entry supports unity callback.
+
+1 - **ITickable (Update)**
+```csharp
+public class Foo: ITickable
+{
+    public void Tick(float deltaTime)
+    {
+        //Do some thing.
+    }
+}
+
+public class InitializeGame : MonoBehaviour
+{
+    private void Awake()
+    {
+        Entry.Entry.Initialize();
+        Entry.Entry.Bind(new Foo());
+    }
+}
+```
+
+2 - **IFixedTickable (FixedUpdate)**
+```csharp
+public class Foo: IFixedTickable
+{
+    public void FixedTick(float fixedDeltaTime)
+    {
+        //Do some thing.
+    }
+}
+
+public class InitializeGame : MonoBehaviour
+{
+    private void Awake()
+    {
+        Entry.Entry.Initialize();
+        Entry.Entry.Bind(new Foo());
+    }
+}
+```
+
+3 - **IReasable**
+```csharp
+public class Foo: IReleasable
+{
+    public void Release()
+    {
+        //Do some thing.
+    }
+}
+
+public class InitializeGame : MonoBehaviour
+{
+    private void Awake()
+    {
+        Entry.Entry.Initialize();
+        Entry.Entry.Bind(new Foo());
+        Entry.Entry.Remove<Foo>();  //Foo's Release will be trigger.
+    }
+}
+```
 
 
 ## Editor
+Open Entry window by path tools > CizaModule > Entry in unity top bar.
+
+
+
 
