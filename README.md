@@ -202,8 +202,12 @@ public class InitializeGame : MonoBehaviour
 
 
 ## Editor
-Open Entry window by path tools > CizaModule > Entry in unity top bar.
+1 - **Open Entry window**
+<img src="Document/Image/EntryWindowPath.png?>
 
+2 - **Entry isn't initialized**
+<img src="Document/Image/EntryWindowIsntInitialized.png?>
 
-
+3 - **Entry is initialized**
+<img src="Document/Image/EntryWindowIsInitialized.png?>
 
