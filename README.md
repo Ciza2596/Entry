@@ -204,13 +204,13 @@ public class InitializeGame : MonoBehaviour
 ## Editor
 1 - **Open Entry window**
 
-<img src="Document/Image/EntryWindowPath.png?>
+<img src="Document/Image/EntryWindowPath.png?/>
 
 2 - **Entry isn't initialized**
           
-<img src="Document/Image/EntryWindowIsntInitialized.png?>
+<img src="Document/Image/EntryWindowIsntInitialized.png?/>
 
 3 - **Entry is initialized**
 
-<img src="Document/Image/EntryWindowIsInitialized.png?>
+<img src="Document/Image/EntryWindowIsInitialized.png?/>
 
