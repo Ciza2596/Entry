@@ -137,13 +137,14 @@ public class InitializeGame : MonoBehaviour
 
 ## EntryPoint
 
-Entry supports unity callback.
+Reference [Unity lifecycle document](https://docs.unity.cn/530/Documentation/Manual/ExecutionOrder.html).
 
-1 - **ITickable (Update)**
+1 - **IFixedTickable**
+Nearly MonoBehaviour.FixedUpdate()
 ```csharp
-public class Foo: ITickable
+public class Foo: IFixedTickable
 {
-    public void Tick(float deltaTime)
+    public void FixedTick(float fixedDeltaTime)
     {
         //Do some thing.
     }
@@ -159,11 +160,12 @@ public class InitializeGame : MonoBehaviour
 }
 ```
 
-2 - **IFixedTickable (FixedUpdate)**
+2 - **ITickable**
+Nearly MonoBehaviour.Update()
 ```csharp
-public class Foo: IFixedTickable
+public class Foo: ITickable
 {
-    public void FixedTick(float fixedDeltaTime)
+    public void Tick(float deltaTime)
     {
         //Do some thing.
     }
