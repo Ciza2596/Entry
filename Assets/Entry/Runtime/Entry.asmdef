@@ -1,17 +1,13 @@
 {
-    "name": "Cilix.Entry.Test",
-    "rootNamespace": "Cilix.Test",
-    "references": [
-        "Cilix.Entry"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "name": "Entry",
+    "rootNamespace": "Cilix",
+    "references": [],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
-    "autoReferenced": false,
+    "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false

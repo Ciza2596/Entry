@@ -1,8 +1,8 @@
 {
-    "name": "Cilix.Entry.Editor",
-    "rootNamespace": "Cilix.Editor",
+    "name": "Entry.Test",
+    "rootNamespace": "",
     "references": [
-        "Cilix.Entry"
+        "Entry"
     ],
     "includePlatforms": [
         "Editor"
