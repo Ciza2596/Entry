@@ -1,4 +1,4 @@
-# Entry
+# Cilix.Entry
 ```
 https://github.com/Ciza2596/Entry.git?path=Assets/Entry
 ```
