@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 
-namespace Cilix.Editor
+namespace CizaEntry.Editor
 {
     public class EntryEditor : EditorWindow
     {

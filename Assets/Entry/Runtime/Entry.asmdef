@@ -1,6 +1,6 @@
 {
     "name": "Entry",
-    "rootNamespace": "Cilix",
+    "rootNamespace": "CizaEntry",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

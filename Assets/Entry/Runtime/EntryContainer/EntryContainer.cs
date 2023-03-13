@@ -6,7 +6,7 @@ using UnityEngine.Assertions;
 using Object = System.Object;
 
 
-namespace Cilix
+namespace CizaEntry
 {
     public class EntryContainer
     {

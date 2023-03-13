@@ -4,12 +4,12 @@ using NUnit.Framework;
 
 public class EntryContainerTest
 {
-    private Cilix.EntryContainer _entryContainer;
+    private CizaEntry.EntryContainer _entryContainer;
 
     [SetUp]
     public void SetUp()
     {
-        _entryContainer = new Cilix.EntryContainer();
+        _entryContainer = new CizaEntry.EntryContainer();
     }
 
     [TearDown]

@@ -1,4 +1,4 @@
-namespace Cilix
+namespace CizaEntry
 {
     public interface IReleasable
     {

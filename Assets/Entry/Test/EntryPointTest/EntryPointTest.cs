@@ -1,5 +1,5 @@
 using System;
-using Cilix;
+using CizaEntry;
 using NUnit.Framework;
 
 public class EntryPointTest

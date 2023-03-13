@@ -1,6 +1,6 @@
 {
     "name": "Entry.Editor",
-    "rootNamespace": "Cilix.Editor",
+    "rootNamespace": "CizaEntry.Editor",
     "references": [
         "Entry"
     ],

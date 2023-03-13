@@ -2,7 +2,7 @@
 
 
 
-namespace Cilix.EntryExample1
+namespace CizaEntry.Example1
 {
     public class MemoryModule : ILateTickable, IReleasable
     {

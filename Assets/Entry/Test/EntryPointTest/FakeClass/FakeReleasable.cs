@@ -1,4 +1,4 @@
-using Cilix;
+using CizaEntry;
 
 public class FakeReleasable :BaseFake, IReleasable
 {

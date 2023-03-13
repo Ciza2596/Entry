@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Cilix
+namespace CizaEntry
 {
     [DisallowMultipleComponent]
     internal class EntryComponent : MonoBehaviour

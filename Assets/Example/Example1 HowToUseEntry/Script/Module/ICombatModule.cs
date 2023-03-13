@@ -1,4 +1,4 @@
-namespace Cilix.EntryExample1
+namespace CizaEntry.Example1
 {
     public interface ICombatModule
     {

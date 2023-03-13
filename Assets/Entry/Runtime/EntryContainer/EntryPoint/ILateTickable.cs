@@ -1,5 +1,5 @@
 
-namespace Cilix
+namespace CizaEntry
 {
     public interface ILateTickable
     {
