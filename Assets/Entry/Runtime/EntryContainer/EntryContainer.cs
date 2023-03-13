@@ -6,20 +6,21 @@ using UnityEngine.Assertions;
 using Object = System.Object;
 
 
-namespace Entry
+namespace Cilix
 {
     public class EntryContainer
     {
         //private variable
         private readonly IReadOnlyList<Type> _entryPointTypes = new List<Type>(3)
-            { typeof(ITickable), typeof(IFixedTickable), typeof(IReleasable) };
+            { typeof(IFixedTickable),typeof(ITickable), typeof(ILateTickable), typeof(IReleasable) };
 
 
         private readonly Dictionary<Type, RootObjectData> _rootObjectDataMap = new Dictionary<Type, RootObjectData>();
         private readonly Dictionary<Type, Type> _rootObjectTypeMap = new Dictionary<Type, Type>();
-
-        private Action<float> _tickHandle;
+        
         private Action<float> _fixedTickHandle;
+        private Action<float> _tickHandle;
+        private Action<float> _lateTickHandle;
 
 
         //Unity callback
@@ -28,6 +29,9 @@ namespace Entry
 
         public void FixedTick(float fixedDeltaTime) =>
             _fixedTickHandle?.Invoke(fixedDeltaTime);
+
+        public void LateTick(float deltaTime) =>
+            _lateTickHandle?.Invoke(deltaTime);
 
 
         //public variable
@@ -224,25 +228,31 @@ namespace Entry
             var rootObjectData = new RootObjectData(rootObject, entryPointTypes);
             _rootObjectDataMap.Add(rootObjectType, rootObjectData);
 
-            AddTickAndFixedTickHandle(rootObject);
+            AddFixedTickAndTickAndLateTickHandle(rootObject);
         }
 
-        private void AddTickAndFixedTickHandle(object rootObject)
+        private void AddFixedTickAndTickAndLateTickHandle(object rootObject)
         {
             if (rootObject is ITickable updatable)
                 _tickHandle += updatable.Tick;
 
             if (rootObject is IFixedTickable fixedUpdatable)
                 _fixedTickHandle += fixedUpdatable.FixedTick;
+
+            if (rootObject is ILateTickable lateUpdatable)
+                _lateTickHandle += lateUpdatable.LateTick;
         }
 
-        private void RemoveTickAndFixedTickHandle(object rootObject)
+        private void RemoveFixedTickAndTickAndLateTickHandle(object rootObject)
         {
             if (rootObject is ITickable updatable)
                 _tickHandle -= updatable.Tick;
 
             if (rootObject is IFixedTickable fixedUpdatable)
                 _fixedTickHandle -= fixedUpdatable.FixedTick;
+
+            if (rootObject is ILateTickable lateUpdatable)
+                _lateTickHandle -= lateUpdatable.LateTick;
         }
 
         private void RemoveRootObjectByRootObjectType(Type rootObjectType)
@@ -255,7 +265,7 @@ namespace Entry
             }
 
             var rootObject = rootObjectData.RootObject;
-            RemoveTickAndFixedTickHandle(rootObject);
+            RemoveFixedTickAndTickAndLateTickHandle(rootObject);
 
             if (rootObject is IReleasable releasable)
                 releasable.Release();

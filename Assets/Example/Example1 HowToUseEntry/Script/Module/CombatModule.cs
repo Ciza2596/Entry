@@ -1,6 +1,6 @@
 
 
-namespace Entry.Example1
+namespace Cilix.Example1
 {
     public class CombatModule : ITickable, IFixedTickable, IReleasable, ICombatModule
     {

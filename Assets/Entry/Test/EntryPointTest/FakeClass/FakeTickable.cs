@@ -1,4 +1,4 @@
-using Entry;
+using Cilix;
 
 public class FakeTickable : BaseFake, ITickable
 {

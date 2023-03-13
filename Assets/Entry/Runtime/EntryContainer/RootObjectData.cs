@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Entry
+namespace Cilix
 {
-    public class RootObjectData
+    internal class RootObjectData
     {
         private readonly Type[] _entryPointTypes;
         private readonly List<Type> _registeredTypes = new List<Type>();

@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Entry
+namespace Cilix
 {
     public static class Entry
     {
@@ -22,7 +22,7 @@ namespace Entry
         {
             if (IsInitialized)
             {
-                Debug.LogWarning("[Entry::Release] Entry is already Initialized.");
+                Debug.LogWarning("[Entry::Initialize] Entry is already Initialized.");
                 return;
             }
 
@@ -34,6 +34,7 @@ namespace Entry
 
             _entryComponent.SetUpdateCallback(_entryContainer.Tick);
             _entryComponent.SetFixedUpdateCallback(_entryContainer.FixedTick);
+            _entryComponent.SetLateUpdateCallback(_entryContainer.LateTick);
             _entryComponent.SetApplicationQuit(Release);
         }
 

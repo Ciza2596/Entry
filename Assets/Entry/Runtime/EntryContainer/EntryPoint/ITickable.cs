@@ -1,4 +1,4 @@
-namespace Entry
+namespace Cilix
 {
     public interface ITickable
     {

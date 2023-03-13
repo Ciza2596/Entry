@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 
-namespace Entry.Editor
+namespace Cilix.Editor
 {
     public class EntryEditor : EditorWindow
     {
@@ -13,7 +13,7 @@ namespace Entry.Editor
         private Vector3 _scrollPosition;
 
         //private method
-        [MenuItem("Tools/CizaModule/Entry",priority = -200)]
+        [MenuItem("Tools/Cilix/Entry",priority = -200)]
         private static void ShowWindow() =>
             GetWindow<EntryEditor>("Entry");
 

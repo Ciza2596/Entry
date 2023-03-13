@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Entry.Example1
+namespace Cilix.Example1
 {
     public class EntryExampleController : MonoBehaviour
     {

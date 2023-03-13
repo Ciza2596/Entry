@@ -1,5 +1,5 @@
 using System;
-using Entry;
+using Cilix;
 using NUnit.Framework;
 
 public class EntryPointTest
@@ -19,25 +19,8 @@ public class EntryPointTest
         _entryContainer = null;
     }
 
-
     [Test]
-    public void _01_Tickable()
-    {
-        //arrange
-        var fakeTickable = Bind_And_Resolve(new FakeTickable());
-        Check_EntryPointType_Match(typeof(ITickable), fakeTickable.GetType());
-        
-        var deltaTime = 0.02f;
-
-        //act
-        _entryContainer.Tick(deltaTime);
-
-        //assert
-        Assert.AreEqual(deltaTime.ToString(), fakeTickable.Result, "DeltaTime doesnt match.");
-    }
-
-    [Test]
-    public void _02_FixedTickable()
+    public void _01_FixedTickable()
     {
         //arrange
         var fakeFixedTickable = Bind_And_Resolve(new FakeFixedTickable());
@@ -51,6 +34,41 @@ public class EntryPointTest
         //assert
         Assert.AreEqual(fixedDeltaTime.ToString(), fakeFixedTickable.Result, "FixedDeltaTime doesnt match.");
     }
+    
+
+    [Test]
+    public void _02_Tickable()
+    {
+        //arrange
+        var fakeTickable = Bind_And_Resolve(new FakeTickable());
+        Check_EntryPointType_Match(typeof(ITickable), fakeTickable.GetType());
+        
+        var deltaTime = 0.02f;
+
+        //act
+        _entryContainer.Tick(deltaTime);
+
+        //assert
+        Assert.AreEqual(deltaTime.ToString(), fakeTickable.Result, "DeltaTime doesnt match.");
+    }
+    
+    
+    [Test]
+    public void _03_LateTickable()
+    {
+        //arrange
+        var fakeLateTickable = Bind_And_Resolve(new FakeLateTickable());
+        Check_EntryPointType_Match(typeof(ILateTickable), fakeLateTickable.GetType());
+        
+        var deltaTime = 0.02f;
+
+        //act
+        _entryContainer.LateTick(deltaTime);
+
+        //assert
+        Assert.AreEqual(deltaTime.ToString(), fakeLateTickable.Result, "DeltaTime doesnt match.");
+    }
+    
 
     [Test]
     public void _03_Releasable()
