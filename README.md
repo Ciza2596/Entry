@@ -32,7 +32,7 @@ public class InitializeGame : MonoBehaviour
 }
 ```
 
-Entry is released then Entry Destroy EntryComponent on DontDestroyOnLoad scene. When Application is quited, entry will auto release.
+Entry is released then Entry Destroy EntryComponent on DontDestroyOnLoad scene. When Application is quited, entry will be auto released.
 
 3 - **Bind**
 ```csharp
