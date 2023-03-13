@@ -13,7 +13,7 @@ namespace CizaEntry.Editor
         private Vector3 _scrollPosition;
 
         //private method
-        [MenuItem("Tools/Cilix/Entry",priority = -200)]
+        [MenuItem("Tools/CizaModule/Entry",priority = -200)]
         private static void ShowWindow() =>
             GetWindow<EntryEditor>("Entry");
 
