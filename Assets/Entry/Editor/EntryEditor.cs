@@ -36,8 +36,9 @@ namespace Cilix.Editor
 
             ShowNumber(rootObjectTypes);
             ShowRootObject(rootObjectTypes);
-            ShowTickable(rootObjectTypes);
             ShowFixedTickable(rootObjectTypes);
+            ShowTickable(rootObjectTypes);
+            ShowLateTickable(rootObjectTypes);
             ShowReleasable(rootObjectTypes);
             ShowRegisteredObjectTypes(rootObjectTypes);
 
@@ -65,6 +66,20 @@ namespace Cilix.Editor
             }, width);
         }
 
+        private void ShowFixedTickable(Type[] rootObjectTypes)
+        {
+            var width = GUILayout.Width(90);
+            ShowVerticalInfo("FixedTickable", () =>
+            {
+                foreach (var rootObjectType in rootObjectTypes)
+                {
+                    Entry.TryGetEntryPointTypes(rootObjectType, out var entryPointTypes);
+                    var tip = entryPointTypes.Contains(typeof(IFixedTickable)) ? "O" : "x";
+                    EditorGUILayout.LabelField(SPACE + tip, width);
+                }
+            }, width);
+        }
+        
         private void ShowTickable(Type[] rootObjectTypes)
         {
             var width = GUILayout.Width(60);
@@ -78,16 +93,16 @@ namespace Cilix.Editor
                 }
             }, width);
         }
-
-        private void ShowFixedTickable(Type[] rootObjectTypes)
+        
+        private void ShowLateTickable(Type[] rootObjectTypes)
         {
-            var width = GUILayout.Width(90);
-            ShowVerticalInfo("FixedTickable", () =>
+            var width = GUILayout.Width(75);
+            ShowVerticalInfo("LateTickable", () =>
             {
                 foreach (var rootObjectType in rootObjectTypes)
                 {
                     Entry.TryGetEntryPointTypes(rootObjectType, out var entryPointTypes);
-                    var tip = entryPointTypes.Contains(typeof(IFixedTickable)) ? "O" : "x";
+                    var tip = entryPointTypes.Contains(typeof(ILateTickable)) ? "O" : "x";
                     EditorGUILayout.LabelField(SPACE + tip, width);
                 }
             }, width);
