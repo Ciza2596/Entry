@@ -1,4 +1,4 @@
-# CilixEngine.Entry
+# Cilix.Entry
 ```
 https://github.com/Ciza2596/Entry.git?path=Assets/Entry
 ```
@@ -15,7 +15,7 @@ Entry is object controller, like singleton.
 public class InitializeGame : MonoBehaviour
 {
     private void Awake() =>
-        Entry.Entry.Initialize();
+        Entry.Initialize();
 }
 ```
 Entry is initialized then Entry instantiate EntryComponent on DontDestroyOnLoad scene. It is responsible for processing Unity callback.
@@ -26,8 +26,8 @@ public class InitializeGame : MonoBehaviour
 {
     private void Awake() 
     {
-        Entry.Entry.Initialize();
-        Entry.Entry.Release();
+        Entry.Initialize();
+        Entry.Release();
     }
 }
 ```
@@ -42,9 +42,9 @@ public class InitializeGame : MonoBehaviour
 {
     private void Awake()
     {
-        Entry.Entry.Initialize();
-        Entry.Entry.Bind(new Foo());              //Bind Foo into Entry.
-        Entry.Entry.TryResolve<Foo>(out var foo); //Get Foo from Entry.
+        Entry.Initialize();
+        Entry.Bind(new Foo());              //Bind Foo into Entry.
+        Entry.TryResolve<Foo>(out var foo); //Get Foo from Entry.
     }
 }
 ```
@@ -57,12 +57,12 @@ public class InitializeGame : MonoBehaviour
 {
     private void Awake()
     {
-        Entry.Entry.Initialize();            
-        Entry.Entry.Bind<IFoo>(new Foo());         //Bind IFoo into Entry.
-        Entry.Entry.TryResolve<IFoo>(out var foo); //Get IFoo from Entry.
+        Entry.Initialize();            
+        Entry.Bind<IFoo>(new Foo());         //Bind IFoo into Entry.
+        Entry.TryResolve<IFoo>(out var foo); //Get IFoo from Entry.
         
         //If find object by Foo, it can't find anything.
-        Entry.Entry.TryResolve<Foo>(out var foo);
+        Entry.TryResolve<Foo>(out var foo);
     }
 }
 ```
@@ -74,11 +74,11 @@ public class InitializeGame : MonoBehaviour
 {
     private void Awake()
     {
-        Entry.Entry.Initialize();            
-        Entry.Entry.BindAndSelf<IFoo, Foo>(new Foo());  //Bind IFoo and Foo into Entry.
+        Entry.Initialize();            
+        Entry.BindAndSelf<IFoo, Foo>(new Foo());  //Bind IFoo and Foo into Entry.
         
-        Entry.Entry.TryResolve<IFoo>(out var foo1); //Get IFoo from Entry.
-        Entry.Entry.TryResolve<Foo>(out var foo2);  //Get Foo from Entry.
+        Entry.TryResolve<IFoo>(out var foo1); //Get IFoo from Entry.
+        Entry.TryResolve<Foo>(out var foo2);  //Get Foo from Entry.
         
         //foo1 and foo2 is same object reference.
     }
@@ -92,11 +92,11 @@ public class InitializeGame : MonoBehaviour
 {
     private void Awake()
     {
-        Entry.Entry.Initialize();            
-        Entry.Entry.BindInheritances(new Foo());  //Bind IFoo and Foo into Entry.
+        Entry.Initialize();            
+        Entry.BindInheritances(new Foo());  //Bind IFoo and Foo into Entry.
         
-        Entry.Entry.TryResolve<IFoo>(out var foo);    //Get IFoo from Entry.
-        Entry.Entry.TryResolve<IFoo2>(out var foo2);  //Get IFoo2 from Entry.
+        Entry.TryResolve<IFoo>(out var foo);    //Get IFoo from Entry.
+        Entry.TryResolve<IFoo2>(out var foo2);  //Get IFoo2 from Entry.
         
         //foo and foo2 is same object reference.
     }
@@ -110,11 +110,11 @@ public class InitializeGame : MonoBehaviour
 {
     private void Awake()
     {
-        Entry.Entry.Initialize();
-        Entry.Entry.BindAndSelf(new Foo());  //RootObject: Foo is registered two key Foo and IFoo.
+        Entry.Initialize();
+        Entry.BindAndSelf(new Foo());  //RootObject: Foo is registered two key Foo and IFoo.
         
-        Entry.Entry.Remove<Foo>();  //RootObject isn't removed, only Foo registered key is removed.
-        Entry.Entry.Remove<IFoo>(); //RootObject is removed, Foo and IFoo registered keys are removed.
+        Entry.Remove<Foo>();  //RootObject isn't removed, only Foo registered key is removed.
+        Entry.Remove<IFoo>(); //RootObject is removed, Foo and IFoo registered keys are removed.
     }
 }
 ```
@@ -126,10 +126,10 @@ public class InitializeGame : MonoBehaviour
 {
     private void Awake()
     {
-        Entry.Entry.Initialize();
-        Entry.Entry.BindAndSelf(new Foo());  //RootObject: Foo is registered two key Foo and IFoo.
+        Entry.Initialize();
+        Entry.BindAndSelf(new Foo());  //RootObject: Foo is registered two key Foo and IFoo.
         
-        Entry.Entry.RemoveRootObject<Foo>(); //RootObject is removed, including Foo and IFoo registered key is removed.
+        Entry.RemoveRootObject<Foo>(); //RootObject is removed, including Foo and IFoo registered key is removed.
     }
 }
 ```
@@ -140,6 +140,7 @@ public class InitializeGame : MonoBehaviour
 Reference [Unity lifecycle document](https://docs.unity.cn/530/Documentation/Manual/ExecutionOrder.html).
 
 1 - **IFixedTickable**
+
 Nearly MonoBehaviour.FixedUpdate()
 ```csharp
 public class Foo: IFixedTickable
@@ -154,13 +155,14 @@ public class InitializeGame : MonoBehaviour
 {
     private void Awake()
     {
-        Entry.Entry.Initialize();
-        Entry.Entry.Bind(new Foo());
+        Entry.Initialize();
+        Entry.Bind(new Foo());
     }
 }
 ```
 
 2 - **ITickable**
+
 Nearly MonoBehaviour.Update()
 ```csharp
 public class Foo: ITickable
@@ -175,13 +177,37 @@ public class InitializeGame : MonoBehaviour
 {
     private void Awake()
     {
-        Entry.Entry.Initialize();
-        Entry.Entry.Bind(new Foo());
+        Entry.Initialize();
+        Entry.Bind(new Foo());
     }
 }
 ```
 
-3 - **IReasable**
+3 - **ILateTickable**
+
+Nearly MonoBehaviour.LateUpdate()
+```csharp
+public class Foo: ILateTickable
+{
+    public void LateTick(float deltaTime)
+    {
+        //Do some thing.
+    }
+}
+
+public class InitializeGame : MonoBehaviour
+{
+    private void Awake()
+    {
+        Entry.Initialize();
+        Entry.Bind(new Foo());
+    }
+}
+```
+
+4 - **IReasable**
+
+When rootObject is removed.
 ```csharp
 public class Foo: IReleasable
 {
@@ -195,9 +221,9 @@ public class InitializeGame : MonoBehaviour
 {
     private void Awake()
     {
-        Entry.Entry.Initialize();
-        Entry.Entry.Bind(new Foo());
-        Entry.Entry.Remove<Foo>();  //Foo's Release will be trigger.
+        Entry.Initialize();
+        Entry.Bind(new Foo());
+        Entry.Remove<Foo>();  //Foo's Release will be trigger.
     }
 }
 ```
