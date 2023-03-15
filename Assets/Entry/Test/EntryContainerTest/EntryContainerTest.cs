@@ -137,7 +137,7 @@ public class EntryContainerTest
     
     
     [Test]
-    public void _09_RemoveAllInstance()
+    public void _09_RemoveAllInstances()
     {
         //arrange
         var fakeInstance = new FakeInstance();

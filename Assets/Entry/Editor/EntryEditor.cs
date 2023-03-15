@@ -39,7 +39,7 @@ namespace CizaEntry.Editor
             ShowFixedTickable(instanceTypes);
             ShowTickable(instanceTypes);
             ShowLateTickable(instanceTypes);
-            ShowReleasable(instanceTypes);
+            ShowDisposable(instanceTypes);
             ShowKeys(instanceTypes);
 
             EditorGUILayout.EndHorizontal();
@@ -108,7 +108,7 @@ namespace CizaEntry.Editor
             }, width);
         }
 
-        private void ShowReleasable(Type[] instanceTypes)
+        private void ShowDisposable(Type[] instanceTypes)
         {
             var width = GUILayout.Width(67);
             ShowVerticalInfo("Disposable", () =>
