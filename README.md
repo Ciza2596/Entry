@@ -121,14 +121,14 @@ If you want to remove an instance and all keys at once, here are some methods th
 ```csharp
 public class Foo: IFoo { }
 
-public class InitializeGame : MonoBehaviour
+public class RemoveExample : MonoBehaviour
 {
     private void Awake()
     {
         Entry.Initialize();
         Entry.BindAndSelf(new Foo());  // Instance Foo is registered with two keys, Foo and IFoo.
         
-        Entry.RemoveInstance<Foo>(); // RootObject is removed, including Foo and IFoo registered key is removed.
+        Entry.RemoveInstance<Foo>();   // RootObject is removed, including Foo and IFoo registered key is removed.
     }
 }
 ```
@@ -140,13 +140,13 @@ Reference [Unity lifecycle document](https://docs.unity.cn/530/Documentation/Man
 
 1 - **IFixedTickable**
 
-Timing: nearly MonoBehaviour.FixedUpdate()
+Timing: Nearly MonoBehaviour.FixedUpdate()
 ```csharp
 public class Foo: IFixedTickable
 {
     public void FixedTick(float fixedDeltaTime)
     {
-        //Do some thing.
+        // Do some thing.
     }
 }
 
@@ -162,13 +162,13 @@ public class IFixedTickableExample : MonoBehaviour
 
 2 - **ITickable**
 
-Nearly MonoBehaviour.Update()
+Time: Nearly MonoBehaviour.Update()
 ```csharp
 public class Foo: ITickable
 {
     public void Tick(float deltaTime)
     {
-        //Do some thing.
+        // Do some thing.
     }
 }
 
@@ -184,13 +184,13 @@ public class ITickableExample : MonoBehaviour
 
 3 - **ILateTickable**
 
-Nearly MonoBehaviour.LateUpdate()
+Time: Nearly MonoBehaviour.LateUpdate()
 ```csharp
 public class Foo: ILateTickable
 {
     public void LateTick(float deltaTime)
     {
-        //Do some thing.
+        // Do some thing.
     }
 }
 
@@ -222,7 +222,7 @@ public class IIReasableExample : MonoBehaviour
     {
         Entry.Initialize();
         Entry.Bind(new Foo());
-        Entry.Remove<Foo>();  // Foo is removed and its method Release() is called.
+        Entry.Remove<Foo>();    // Foo is removed and its method Release() is called.
     }
 }
 ```
