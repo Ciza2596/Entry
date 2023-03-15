@@ -7,22 +7,22 @@ https://github.com/Ciza2596/Entry.git?path=Assets/Entry
 Entry is an object manager. It supports unity callback methods including FixedUpdate, Update and  LateUpdate.
 
 
-## Method
+## Methods
 
 1 - **Initialize**
 
 ```csharp
-public class InitializeGame : MonoBehaviour
+public class InitializeExample : MonoBehaviour
 {
     private void Awake() =>
         Entry.Initialize();
 }
 ```
-Entry is initialized then Entry instantiate EntryComponent on DontDestroyOnLoad scene. It is responsible for processing Unity callback.
+Initialzes Entry and instantiates an EntryComponent on DontDestroyOnLoad scene. The EntryComponent is reponsible for processing Unity callbacks. 
 
 2 - **Release**
 ```csharp
-public class InitializeGame : MonoBehaviour
+public class ReleaseExample : MonoBehaviour
 {
     private void Awake() 
     {
@@ -31,20 +31,19 @@ public class InitializeGame : MonoBehaviour
     }
 }
 ```
-
-Entry is released then Entry Destroy EntryComponent on DontDestroyOnLoad scene. When Application is quited, entry will be auto released.
+Releases Entry and Destroies the EntryComponent on DontDestroyOnLoad scene. When application is quitted, Entry will be released automatically.
 
 3 - **Bind**
 ```csharp
 public class Foo { }
 
-public class InitializeGame : MonoBehaviour
+public class BindExample : MonoBehaviour
 {
     private void Awake()
     {
-        Entry.Initialize();
-        Entry.Bind(new Foo());              //Bind Foo into Entry.
-        Entry.TryResolve<Foo>(out var foo); //Get Foo from Entry.
+        Entry.Initialize();                 // Entry is initialized.
+        Entry.Bind(new Foo());              // Bind Foo into Entry.
+        Entry.TryResolve<Foo>(out var foo); // Get Foo from Entry.
     }
 }
 ```
@@ -53,52 +52,52 @@ or
 ```csharp
 public class Foo: IFoo { }
 
-public class InitializeGame : MonoBehaviour
+public class BindExample : MonoBehaviour
 {
     private void Awake()
     {
         Entry.Initialize();            
-        Entry.Bind<IFoo>(new Foo());         //Bind IFoo into Entry.
-        Entry.TryResolve<IFoo>(out var foo); //Get IFoo from Entry.
+        Entry.Bind<IFoo>(new Foo());         // Bind Foo with key IFoo into Entry.
+        Entry.TryResolve<IFoo>(out var foo); // Get IFoo from instance Foo in Entry.
         
-        //If find object by Foo, it can't find anything.
+        // Since instance Foo is registered with key IFoo, getting Foo by using key Foo will not work.
         Entry.TryResolve<Foo>(out var foo);
     }
 }
 ```
-Want to register more key for one object, some methods support it.
+Binding multiple keys for a single object is available. Here are some methods that support it.
 ```csharp
 public class Foo: IFoo { }
 
-public class InitializeGame : MonoBehaviour
+public class BindExample : MonoBehaviour
 {
     private void Awake()
     {
         Entry.Initialize();            
-        Entry.BindAndSelf<IFoo, Foo>(new Foo());  //Bind IFoo and Foo into Entry.
+        Entry.BindAndSelf<IFoo, Foo>(new Foo());  // Bind Foo with key IFoo and Foo into Entry.
         
-        Entry.TryResolve<IFoo>(out var foo1); //Get IFoo from Entry.
-        Entry.TryResolve<Foo>(out var foo2);  //Get Foo from Entry.
+        Entry.TryResolve<IFoo>(out var foo1); // Get IFoo from instance Foo in Entry.
+        Entry.TryResolve<Foo>(out var foo2);  // Get Foo from instance Foo in Entry.
         
-        //foo1 and foo2 is same object reference.
+        // The object reference of foo1 and foo2 is the same.
     }
 }
 ```
 or
 ```csharp
-public class Foo: IFoo, IFoo2 { }
+public class Foo: BaseFoo, IFoo { }
 
-public class InitializeGame : MonoBehaviour
+public class BindExample : MonoBehaviour
 {
     private void Awake()
     {
         Entry.Initialize();            
-        Entry.BindInheritances(new Foo());  //Bind IFoo and Foo into Entry.
+        Entry.BindInheritances(new Foo());  // Bind Foo with key BaseFoo and IFoo into Entry.
         
-        Entry.TryResolve<IFoo>(out var foo);    //Get IFoo from Entry.
-        Entry.TryResolve<IFoo2>(out var foo2);  //Get IFoo2 from Entry.
+        Entry.TryResolve<BaseFoo>(out var foo1);  // Get BaseFoo from instance Foo in Entry.
+        Entry.TryResolve<IFoo>(out var foo2);    // Get IFoo from instance Foo in Entry.
         
-        //foo and foo2 is same object reference.
+        // The object reference of foo1 and foo2 is the same.
     }
 }
 ```
@@ -106,19 +105,19 @@ public class InitializeGame : MonoBehaviour
 ```csharp
 public class Foo: IFoo { }
 
-public class InitializeGame : MonoBehaviour
+public class RemoveExample : MonoBehaviour
 {
     private void Awake()
     {
         Entry.Initialize();
-        Entry.BindAndSelf(new Foo());  //RootObject: Foo is registered two key Foo and IFoo.
+        Entry.BindAndSelf(new Foo());  // Instance Foo is registered with two keys, Foo and IFoo.
         
-        Entry.Remove<Foo>();  //RootObject isn't removed, only Foo registered key is removed.
-        Entry.Remove<IFoo>(); //RootObject is removed, Foo and IFoo registered keys are removed.
+        Entry.RemoveKey<Foo>();   // Remove key Foo from instance Foo. Instance Foo won't be removed from Entry, because it still has a key, IFoo.
+        Entry.RemoveKey<IFoo>();  // Instance Foo and key IFoo are both removed.
     }
 }
 ```
-Want to remove RootObject once.
+If you want to remove an instance and all keys at once, here are some methods that support it.
 ```csharp
 public class Foo: IFoo { }
 
@@ -127,9 +126,9 @@ public class InitializeGame : MonoBehaviour
     private void Awake()
     {
         Entry.Initialize();
-        Entry.BindAndSelf(new Foo());  //RootObject: Foo is registered two key Foo and IFoo.
+        Entry.BindAndSelf(new Foo());  // Instance Foo is registered with two keys, Foo and IFoo.
         
-        Entry.RemoveRootObject<Foo>(); //RootObject is removed, including Foo and IFoo registered key is removed.
+        Entry.RemoveInstance<Foo>(); // RootObject is removed, including Foo and IFoo registered key is removed.
     }
 }
 ```
@@ -141,7 +140,7 @@ Reference [Unity lifecycle document](https://docs.unity.cn/530/Documentation/Man
 
 1 - **IFixedTickable**
 
-Nearly MonoBehaviour.FixedUpdate()
+Timing: nearly MonoBehaviour.FixedUpdate()
 ```csharp
 public class Foo: IFixedTickable
 {
@@ -151,7 +150,7 @@ public class Foo: IFixedTickable
     }
 }
 
-public class InitializeGame : MonoBehaviour
+public class IFixedTickableExample : MonoBehaviour
 {
     private void Awake()
     {
@@ -173,7 +172,7 @@ public class Foo: ITickable
     }
 }
 
-public class InitializeGame : MonoBehaviour
+public class ITickableExample : MonoBehaviour
 {
     private void Awake()
     {
@@ -195,7 +194,7 @@ public class Foo: ILateTickable
     }
 }
 
-public class InitializeGame : MonoBehaviour
+public class ILateTickableExample : MonoBehaviour
 {
     private void Awake()
     {
@@ -207,23 +206,23 @@ public class InitializeGame : MonoBehaviour
 
 4 - **IReasable**
 
-When rootObject is removed.
+When an instance that implements IReleasable is removed, the method Release() will be called.
 ```csharp
 public class Foo: IReleasable
 {
     public void Release()
     {
-        //Do some thing.
+        // Do some thing.
     }
 }
 
-public class InitializeGame : MonoBehaviour
+public class IIReasableExample : MonoBehaviour
 {
     private void Awake()
     {
         Entry.Initialize();
         Entry.Bind(new Foo());
-        Entry.Remove<Foo>();  //Foo's Release will be trigger.
+        Entry.Remove<Foo>();  // Foo is removed and its method Release() is called.
     }
 }
 ```
