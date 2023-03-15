@@ -204,25 +204,25 @@ public class ILateTickableExample : MonoBehaviour
 }
 ```
 
-4 - **IReasable**
+4 - **IDisposable**
 
-When an instance that implements IReleasable is removed, the method Release() will be called.
+When an instance that implements IDisposable is removed, the method Dispose() will be called.
 ```csharp
-public class Foo: IReleasable
+public class Foo: IDisposable
 {
-    public void Release()
+    public void Dispose()
     {
         // Do some thing.
     }
 }
 
-public class IIReasableExample : MonoBehaviour
+public class IDisposableExample : MonoBehaviour
 {
     private void Awake()
     {
         Entry.Initialize();
         Entry.Bind(new Foo());
-        Entry.Remove<Foo>();    // Foo is removed and its method Release() is called.
+        Entry.Remove<Foo>();    // Foo is removed and its method Dispose() is called.
     }
 }
 ```
