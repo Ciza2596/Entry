@@ -76,8 +76,8 @@ public class BindExample : MonoBehaviour
         Entry.Initialize();            
         Entry.BindAndSelf<IFoo, Foo>(new Foo());  // Bind Foo with key IFoo and Foo into Entry.
         
-        Entry.TryResolve<IFoo>(out var foo1); // Get IFoo from instance Foo in Entry.
-        Entry.TryResolve<Foo>(out var foo2);  // Get Foo from instance Foo in Entry.
+        Entry.TryResolve<IFoo>(out var foo1);     // Get IFoo from instance Foo in Entry.
+        Entry.TryResolve<Foo>(out var foo2);      // Get Foo from instance Foo in Entry.
         
         // The object reference of foo1 and foo2 is the same.
     }
@@ -92,10 +92,10 @@ public class BindExample : MonoBehaviour
     private void Awake()
     {
         Entry.Initialize();            
-        Entry.BindInheritances(new Foo());  // Bind Foo with key BaseFoo and IFoo into Entry.
+        Entry.BindInheritances(new Foo());        // Bind Foo with key BaseFoo and IFoo into Entry.
         
         Entry.TryResolve<BaseFoo>(out var foo1);  // Get BaseFoo from instance Foo in Entry.
-        Entry.TryResolve<IFoo>(out var foo2);    // Get IFoo from instance Foo in Entry.
+        Entry.TryResolve<IFoo>(out var foo2);     // Get IFoo from instance Foo in Entry.
         
         // The object reference of foo1 and foo2 is the same.
     }
@@ -112,8 +112,8 @@ public class RemoveExample : MonoBehaviour
         Entry.Initialize();
         Entry.BindAndSelf(new Foo());  // Instance Foo is registered with two keys, Foo and IFoo.
         
-        Entry.RemoveKey<Foo>();   // Remove key Foo from instance Foo. Instance Foo won't be removed from Entry, because it still has a key, IFoo.
-        Entry.RemoveKey<IFoo>();  // Instance Foo and key IFoo are both removed.
+        Entry.RemoveKey<Foo>();        // Remove key Foo from instance Foo. Instance Foo won't be removed from Entry, because it still has a key, IFoo.
+        Entry.RemoveKey<IFoo>();       // Instance Foo and key IFoo are both removed.
     }
 }
 ```
@@ -128,7 +128,7 @@ public class RemoveExample : MonoBehaviour
         Entry.Initialize();
         Entry.BindAndSelf(new Foo());  // Instance Foo is registered with two keys, Foo and IFoo.
         
-        Entry.RemoveInstance<Foo>();   // RootObject is removed, including Foo and IFoo registered key is removed.
+        Entry.RemoveInstance<Foo>();   // Instance Foo, key Foo and key IFoo are all removed.
     }
 }
 ```
