@@ -11,10 +11,5 @@ namespace CizaEntry.Example1
             Entry.BindInheritancesAndSelf(new DungeonModule());
             Entry.BindInheritancesAndSelf(new MemoryModule());
         }
-
-        private void OnDisable()
-        {
-            Entry.Release();
-        }
     }
 }

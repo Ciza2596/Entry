@@ -13,7 +13,7 @@ namespace CizaEntry.Editor
         private Vector3 _scrollPosition;
 
         //private method
-        [MenuItem("Tools/CizaModule/Entry",priority = -200)]
+        [MenuItem("Tools/Ciza/Entry", priority = -200)]
         private static void ShowWindow() =>
             GetWindow<EntryEditor>("Entry");
 
@@ -21,7 +21,7 @@ namespace CizaEntry.Editor
         {
             if (!Entry.IsInitialized)
             {
-                EditorGUILayout.LabelField("Entry isnt initialized.");
+                EditorGUILayout.LabelField("Entry isn't initialized.");
                 return;
             }
 
@@ -30,111 +30,111 @@ namespace CizaEntry.Editor
 
         private void ShowDetail()
         {
-            var rootObjectTypes = Entry.RootObjectTypes;
+            var instanceTypes = Entry.InstanceTypes;
 
             EditorGUILayout.BeginHorizontal();
 
-            ShowNumber(rootObjectTypes);
-            ShowRootObject(rootObjectTypes);
-            ShowFixedTickable(rootObjectTypes);
-            ShowTickable(rootObjectTypes);
-            ShowLateTickable(rootObjectTypes);
-            ShowReleasable(rootObjectTypes);
-            ShowRegisteredObjectTypes(rootObjectTypes);
+            ShowNumber(instanceTypes);
+            ShowInstance(instanceTypes);
+            ShowFixedTickable(instanceTypes);
+            ShowTickable(instanceTypes);
+            ShowLateTickable(instanceTypes);
+            ShowReleasable(instanceTypes);
+            ShowKeys(instanceTypes);
 
             EditorGUILayout.EndHorizontal();
         }
 
-        private void ShowNumber(Type[] rootObjectTypes)
+        private void ShowNumber(Type[] instanceTypes)
         {
             var width = GUILayout.Width(20);
             ShowVerticalInfo("", () =>
             {
-                var length = rootObjectTypes.Length;
+                var length = instanceTypes.Length;
                 for (var i = 1; i <= length; i++)
                     EditorGUILayout.LabelField(i.ToString() + ": ", width);
             }, width);
         }
 
-        private void ShowRootObject(Type[] rootObjectTypes)
+        private void ShowInstance(Type[] instanceTypes)
         {
             var width = GUILayout.Width(150);
-            ShowVerticalInfo("RootObject", () =>
+            ShowVerticalInfo("Instance", () =>
             {
-                foreach (var rootObjectType in rootObjectTypes)
-                    EditorGUILayout.LabelField(rootObjectType.Name, width);
+                foreach (var instanceType in instanceTypes)
+                    EditorGUILayout.LabelField(instanceType.Name, width);
             }, width);
         }
 
-        private void ShowFixedTickable(Type[] rootObjectTypes)
+        private void ShowFixedTickable(Type[] instanceTypes)
         {
             var width = GUILayout.Width(90);
             ShowVerticalInfo("FixedTickable", () =>
             {
-                foreach (var rootObjectType in rootObjectTypes)
+                foreach (var instanceType in instanceTypes)
                 {
-                    Entry.TryGetEntryPointTypes(rootObjectType, out var entryPointTypes);
-                    var tip = entryPointTypes.Contains(typeof(IFixedTickable)) ? "O" : "x";
+                    Entry.TryGetEntryPoints(instanceType, out var entryPoints);
+                    var tip = entryPoints.Contains(typeof(IFixedTickable)) ? "O" : "x";
                     EditorGUILayout.LabelField(SPACE + tip, width);
                 }
             }, width);
         }
-        
-        private void ShowTickable(Type[] rootObjectTypes)
+
+        private void ShowTickable(Type[] instanceTypes)
         {
             var width = GUILayout.Width(60);
             ShowVerticalInfo("Tickable", () =>
             {
-                foreach (var rootObjectType in rootObjectTypes)
+                foreach (var instanceType in instanceTypes)
                 {
-                    Entry.TryGetEntryPointTypes(rootObjectType, out var entryPointTypes);
-                    var tip = entryPointTypes.Contains(typeof(ITickable)) ? "O" : "x";
+                    Entry.TryGetEntryPoints(instanceType, out var entryPoints);
+                    var tip = entryPoints.Contains(typeof(ITickable)) ? "O" : "x";
                     EditorGUILayout.LabelField(SPACE + tip, width);
                 }
             }, width);
         }
-        
-        private void ShowLateTickable(Type[] rootObjectTypes)
+
+        private void ShowLateTickable(Type[] instanceTypes)
         {
             var width = GUILayout.Width(75);
             ShowVerticalInfo("LateTickable", () =>
             {
-                foreach (var rootObjectType in rootObjectTypes)
+                foreach (var instanceType in instanceTypes)
                 {
-                    Entry.TryGetEntryPointTypes(rootObjectType, out var entryPointTypes);
-                    var tip = entryPointTypes.Contains(typeof(ILateTickable)) ? "O" : "x";
+                    Entry.TryGetEntryPoints(instanceType, out var entryPoints);
+                    var tip = entryPoints.Contains(typeof(ILateTickable)) ? "O" : "x";
                     EditorGUILayout.LabelField(SPACE + tip, width);
                 }
             }, width);
         }
 
-        private void ShowReleasable(Type[] rootObjectTypes)
+        private void ShowReleasable(Type[] instanceTypes)
         {
             var width = GUILayout.Width(67);
-            ShowVerticalInfo("Releasable", () =>
+            ShowVerticalInfo("Disposable", () =>
             {
-                foreach (var rootObjectType in rootObjectTypes)
+                foreach (var instanceType in instanceTypes)
                 {
-                    Entry.TryGetEntryPointTypes(rootObjectType, out var entryPointTypes);
-                    var tip = entryPointTypes.Contains(typeof(IReleasable)) ? "O" : "x";
+                    Entry.TryGetEntryPoints(instanceType, out var entryPoints);
+                    var tip = entryPoints.Contains(typeof(IDisposable)) ? "O" : "x";
                     EditorGUILayout.LabelField(SPACE + tip, width);
                 }
             }, width);
         }
 
-        private void ShowRegisteredObjectTypes(Type[] rootObjectTypes)
+        private void ShowKeys(Type[] instanceTypes)
         {
-            ShowVerticalInfo("RegisteredObjectTypes", () =>
+            ShowVerticalInfo("Keys", () =>
             {
-                foreach (var rootObjectType in rootObjectTypes)
+                foreach (var instanceType in instanceTypes)
                 {
-                    Entry.TryGetRegisteredObjectTypes(rootObjectType, out var registeredTypes);
+                    Entry.TryGetKeys(instanceType, out var keys);
 
-                    var rootObjectTypeNames = string.Empty;
-                    foreach (var registeredType in registeredTypes)
-                        rootObjectTypeNames += registeredType.Name + ", ";
+                    var instanceTypeNames = string.Empty;
+                    foreach (var key in keys)
+                        instanceTypeNames += key.Name + ", ";
 
-                    EditorGUILayout.LabelField(rootObjectTypeNames);
+                    EditorGUILayout.LabelField(instanceTypeNames);
                 }
             });
         }

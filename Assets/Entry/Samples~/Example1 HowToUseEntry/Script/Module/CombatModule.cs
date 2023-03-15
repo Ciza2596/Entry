@@ -1,8 +1,8 @@
-
+using System;
 
 namespace CizaEntry.Example1
 {
-    public class CombatModule : ITickable, IFixedTickable, IReleasable, ICombatModule
+    public class CombatModule : ITickable, IFixedTickable, IDisposable, ICombatModule
     {
         public void Tick(float deltaTime)
         {
@@ -12,7 +12,7 @@ namespace CizaEntry.Example1
         {
         }
 
-        public void Release()
+        public void Dispose()
         {
         }
     }

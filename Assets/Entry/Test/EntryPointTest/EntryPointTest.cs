@@ -15,7 +15,7 @@ public class EntryPointTest
     [TearDown]
     public void TearDown()
     {
-        _entryContainer.RemoveAllRootObjects();
+        _entryContainer.RemoveAllInstances();
         _entryContainer = null;
     }
 
@@ -24,7 +24,7 @@ public class EntryPointTest
     {
         //arrange
         var fakeFixedTickable = Bind_And_Resolve(new FakeFixedTickable());
-        Check_EntryPointType_Match(typeof(IFixedTickable), fakeFixedTickable.GetType());
+        Check_EntryPoint_Match(typeof(IFixedTickable), fakeFixedTickable.GetType());
 
         var fixedDeltaTime = 0.02f;
 
@@ -41,7 +41,7 @@ public class EntryPointTest
     {
         //arrange
         var fakeTickable = Bind_And_Resolve(new FakeTickable());
-        Check_EntryPointType_Match(typeof(ITickable), fakeTickable.GetType());
+        Check_EntryPoint_Match(typeof(ITickable), fakeTickable.GetType());
         
         var deltaTime = 0.02f;
 
@@ -58,7 +58,7 @@ public class EntryPointTest
     {
         //arrange
         var fakeLateTickable = Bind_And_Resolve(new FakeLateTickable());
-        Check_EntryPointType_Match(typeof(ILateTickable), fakeLateTickable.GetType());
+        Check_EntryPoint_Match(typeof(ILateTickable), fakeLateTickable.GetType());
         
         var deltaTime = 0.02f;
 
@@ -71,34 +71,34 @@ public class EntryPointTest
     
 
     [Test]
-    public void _03_Releasable()
+    public void _03_Disposable()
     {
         //arrange
-        var fakeReleasable = Bind_And_Resolve(new FakeReleasable());
-        Check_EntryPointType_Match(typeof(IReleasable), fakeReleasable.GetType());
+        var fakeReleasable = Bind_And_Resolve(new FakeDisposable());
+        Check_EntryPoint_Match(typeof(IDisposable), fakeReleasable.GetType());
 
         //act
-        _entryContainer.RemoveRootObject<FakeReleasable>();
+        _entryContainer.RemoveInstance<FakeDisposable>();
 
         //assert
-        Assert.IsTrue(!string.IsNullOrWhiteSpace(fakeReleasable.Result), "The object doesnt release.");
+        Assert.IsTrue(!string.IsNullOrWhiteSpace(fakeReleasable.Result), "The object doesnt dispose.");
     }
 
 
     //private method
-    private TRootObject Bind_And_Resolve<TRootObject>(TRootObject rootObject) where TRootObject : class
+    private TInstance Bind_And_Resolve<TInstance>(TInstance instance) where TInstance : class
     {
-        _entryContainer.Bind(rootObject);
-        _entryContainer.TryResolve<TRootObject>(out var registeredObject);
+        _entryContainer.Bind(instance);
+        _entryContainer.TryResolve<TInstance>(out var registeredObject);
 
         return registeredObject;
     }
 
-    private void Check_EntryPointType_Match(Type exceptedType, Type rootObjectType)
+    private void Check_EntryPoint_Match(Type expectedEntryPoint, Type entryPoint)
     {
-        _entryContainer.TryGetEntryPointTypes(rootObjectType, out var entryPointTypes);
-        var entryPointType = entryPointTypes[0];
-        Assert.AreEqual(exceptedType, entryPointType,
-            $"EntryPoint is not match. ExceptedType: {exceptedType}, entryPointType: {entryPointType}.");
+        _entryContainer.TryGetEntryPoints(entryPoint, out var entryPoints);
+        var entryPointType = entryPoints[0];
+        Assert.AreEqual(expectedEntryPoint, entryPointType,
+            $"EntryPoint is not match. ExpectedEntryPoint: {expectedEntryPoint}, EntryPoint: {entryPointType}.");
     }
 }

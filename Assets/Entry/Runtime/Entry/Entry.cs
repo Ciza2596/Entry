@@ -13,8 +13,8 @@ namespace CizaEntry
 
         //public variable
         public static bool IsInitialized => _entryContainer != null && _entryComponent != null;
-        public static Type[] RootObjectTypes => CheckIsNotInitialized() ? null : _entryContainer.RootObjectTypes;
-        public static Type[] RegisteredObjectTypes => CheckIsNotInitialized() ? null : _entryContainer.RegisteredObjectTypes;
+        public static Type[] InstanceTypes => CheckIsNotInitialized() ? null : _entryContainer.InstanceTypes;
+        public static Type[] Keys => CheckIsNotInitialized() ? null : _entryContainer.Keys;
 
         
         //public method
@@ -28,7 +28,8 @@ namespace CizaEntry
 
             _entryContainer = new EntryContainer();
 
-            var entry = new GameObject(nameof(Entry));
+            var entryName = $"[{nameof(Entry)}]";
+            var entry = new GameObject(entryName);
             Object.DontDestroyOnLoad(entry);
             _entryComponent = entry.AddComponent<EntryComponent>();
 
@@ -46,7 +47,7 @@ namespace CizaEntry
                 return;   
             }
 
-            _entryContainer.RemoveAllRootObjects();
+            _entryContainer.RemoveAllInstances();
             _entryContainer = null;
 
 
@@ -58,113 +59,113 @@ namespace CizaEntry
             Object.Destroy(entryUpdateComponent.gameObject);
         }
 
-        public static bool TryGetRootObjectType(Type registeredObjectType, out Type rootObjectType)
+        public static bool TryGetInstanceType(Type key, out Type instanceType)
         {
-            rootObjectType = null;
+            instanceType = null;
             if (CheckIsNotInitialized())
                 return false;
             
-           return _entryContainer.TryGetRootObjectType(registeredObjectType, out rootObjectType);
+           return _entryContainer.TryGetInstanceType(key, out instanceType);
         }
 
-        public static bool TryGetRegisteredObjectTypes(Type rootObjectType, out Type[] registeredTypes)
+        public static bool TryGetKeys(Type instanceType, out Type[] keys)
         {
-            registeredTypes = null;
+            keys = null;
             if (CheckIsNotInitialized())
                 return false;
             
-            return _entryContainer.TryGetRegisteredObjectTypes(rootObjectType, out registeredTypes);
+            return _entryContainer.TryGetKeys(instanceType, out keys);
         }
 
-        public static bool TryGetEntryPointTypes(Type rootObjectType, out Type[] entryPointTypes)
+        public static bool TryGetEntryPoints(Type instanceType, out Type[] entryPoints)
         {
-            entryPointTypes = null;
+            entryPoints = null;
             if (CheckIsNotInitialized())
                 return false;
             
-            return _entryContainer.TryGetEntryPointTypes(rootObjectType, out entryPointTypes);
+            return _entryContainer.TryGetEntryPoints(instanceType, out entryPoints);
         }
 
 
 
-        public static void Bind<TRootObject>(TRootObject rootObject) where TRootObject : class
+        public static void Bind<TInstance>(TInstance instance) where TInstance : class
         {
             if (CheckIsNotInitialized())
                 return;
 
-            _entryContainer.Bind(rootObject);
+            _entryContainer.Bind(instance);
         }
 
 
-        public static void Bind<TRegisteredObject, TRootObject>(TRootObject rootObject)
-            where TRegisteredObject : class where TRootObject : class
+        public static void Bind<TKey, TInstance>(TInstance instance)
+            where TKey : class where TInstance : class
         {
             if (CheckIsNotInitialized())
                 return;
 
-            _entryContainer.Bind<TRegisteredObject, TRootObject>(rootObject);
+            _entryContainer.Bind<TKey, TInstance>(instance);
         }
 
-        public static void BindAndSelf<TRegisteredObject, TRootObject>(TRootObject rootObject)
-            where TRegisteredObject : class where TRootObject : class
+        public static void BindAndSelf<TKey, TInstance>(TInstance instance)
+            where TKey : class where TInstance : class
         {
             if (CheckIsNotInitialized())
                 return;
 
-            _entryContainer.BindAndSelf<TRegisteredObject, TRootObject>(rootObject);
+            _entryContainer.BindAndSelf<TKey, TInstance>(instance);
         }
 
 
-        public static void BindInheritances<TRootObject>(TRootObject rootObject) where TRootObject : class
+        public static void BindInheritances<TInstance>(TInstance instance) where TInstance : class
         {
             if (CheckIsNotInitialized())
                 return;
 
-            _entryContainer.BindInheritances(rootObject);
+            _entryContainer.BindInheritances(instance);
         }
 
-        public static void BindInheritancesAndSelf<TRootObject>(TRootObject rootObject) where TRootObject : class
+        public static void BindInheritancesAndSelf<TInstance>(TInstance instance) where TInstance : class
         {
             if (CheckIsNotInitialized())
                 return;
 
-            _entryContainer.BindInheritancesAndSelf(rootObject);
+            _entryContainer.BindInheritancesAndSelf(instance);
         }
 
 
-        public static bool TryResolve<TRegisteredObject>(out TRegisteredObject registeredObject)
-            where TRegisteredObject : class
+        public static bool TryResolve<TKey>(out TKey keyObject)
+            where TKey : class
         {
-            registeredObject = null;
+            keyObject = null;
             if (CheckIsNotInitialized())
                 return false;
 
-            return _entryContainer.TryResolve(out registeredObject);
+            return _entryContainer.TryResolve(out keyObject);
         }
 
 
-        public static void Remove(Type registeredType)
+        public static void RemoveKey(Type key)
         {
             if (CheckIsNotInitialized())
                 return;
 
-            _entryContainer.Remove(registeredType);
+            _entryContainer.RemoveKey(key);
         }
 
-        public static void RemoveRootObject(Type registeredType)
+        public static void RemoveInstance(Type key)
         {
             if (CheckIsNotInitialized())
                 return;
 
-            _entryContainer.RemoveRootObject(registeredType);
+            _entryContainer.RemoveInstance(key);
         }
 
-        public static void RemoveAllRootObjects()
+        public static void RemoveAllInstances()
         {
             if (CheckIsNotInitialized())
                 return;
 
-            _entryContainer.RemoveAllRootObjects();
+            _entryContainer.RemoveAllInstances();
         }
 
 

@@ -11,13 +11,13 @@ namespace CizaEntry
     public class EntryContainer
     {
         //private variable
-        private readonly IReadOnlyList<Type> _entryPointTypes = new List<Type>(3)
-            { typeof(IFixedTickable),typeof(ITickable), typeof(ILateTickable), typeof(IReleasable) };
+        private readonly IReadOnlyList<Type> _entryPoints = new List<Type>(3)
+            { typeof(IFixedTickable), typeof(ITickable), typeof(ILateTickable), typeof(IDisposable) };
 
 
-        private readonly Dictionary<Type, RootObjectData> _rootObjectDataMap = new Dictionary<Type, RootObjectData>();
-        private readonly Dictionary<Type, Type> _rootObjectTypeMap = new Dictionary<Type, Type>();
-        
+        private readonly Dictionary<Type, InstanceData> _instanceDataMap = new Dictionary<Type, InstanceData>();
+        private readonly Dictionary<Type, Type> _instanceTypeMap = new Dictionary<Type, Type>();
+
         private Action<float> _fixedTickHandle;
         private Action<float> _tickHandle;
         private Action<float> _lateTickHandle;
@@ -35,258 +35,258 @@ namespace CizaEntry
 
 
         //public variable
-        public Type[] RootObjectTypes => _rootObjectDataMap.Keys.ToArray();
-        public Type[] RegisteredObjectTypes => _rootObjectTypeMap.Keys.ToArray();
+        public Type[] InstanceTypes => _instanceDataMap.Keys.ToArray();
+        public Type[] Keys => _instanceTypeMap.Keys.ToArray();
 
 
         //public method
-        public bool TryGetRootObjectType(Type registeredObjectType, out Type rootObjectType) =>
-            _rootObjectTypeMap.TryGetValue(registeredObjectType, out rootObjectType);
+        public bool TryGetInstanceType(Type key, out Type instanceType) =>
+            _instanceTypeMap.TryGetValue(key, out instanceType);
 
-        public bool TryGetRegisteredObjectTypes(Type rootObjectType, out Type[] registeredTypes)
+        public bool TryGetKeys(Type instanceType, out Type[] keys)
         {
-            registeredTypes = null;
+            keys = null;
 
-            if (!_rootObjectDataMap.TryGetValue(rootObjectType, out var rootObjectData))
+            if (!_instanceDataMap.TryGetValue(instanceType, out var instanceData))
                 return false;
 
-            registeredTypes = rootObjectData.RegisteredTypes;
+            keys = instanceData.Keys;
             return true;
         }
 
-        public bool TryGetEntryPointTypes(Type rootObjectType, out Type[] entryPointTypes)
+        public bool TryGetEntryPoints(Type instanceType, out Type[] entryPoints)
         {
-            entryPointTypes = null;
-            if (!_rootObjectDataMap.TryGetValue(rootObjectType, out var rootObjectData))
+            entryPoints = null;
+            if (!_instanceDataMap.TryGetValue(instanceType, out var instanceData))
                 return false;
 
-            entryPointTypes = rootObjectData.EntryPointTypes;
-            return entryPointTypes != null && entryPointTypes.Length > 0;
+            entryPoints = instanceData.EntryPoints;
+            return entryPoints != null && entryPoints.Length > 0;
         }
 
 
-        public void Bind<TRootObject>(TRootObject rootObject) where TRootObject : class =>
-            Bind<TRootObject, TRootObject>(rootObject);
+        public void Bind<TInstance>(TInstance instance) where TInstance : class =>
+            Bind<TInstance, TInstance>(instance);
 
 
-        public void Bind<TRegisteredObject, TRootObject>(TRootObject rootObject)
-            where TRegisteredObject : class where TRootObject : class =>
-            Bind(typeof(TRegisteredObject), rootObject);
+        public void Bind<TKey, TInstance>(TInstance instance)
+            where TKey : class where TInstance : class =>
+            Bind(typeof(TKey), instance);
 
-        public void BindAndSelf<TRegisteredObject, TRootObject>(TRootObject rootObject)
-            where TRegisteredObject : class where TRootObject : class
+        public void BindAndSelf<TKey, TInstance>(TInstance instance)
+            where TKey : class where TInstance : class
         {
-            var registeredTypes = new[] { typeof(TRegisteredObject), typeof(TRootObject) };
-            foreach (var canBeRegisteredType in registeredTypes)
-                Bind(canBeRegisteredType, rootObject);
+            var keys = new[] { typeof(TKey), typeof(TInstance) };
+            foreach (var key in keys)
+                Bind(key, instance);
         }
 
-        public void BindInheritances<TRootObject>(TRootObject rootObject) where TRootObject : class
+        public void BindInheritances<TInstance>(TInstance instance) where TInstance : class
         {
-            var rootObjectType = typeof(TRootObject);
-            var canBeRegisteredTypes = GetCanBeRegisteredTypes(rootObjectType);
+            var instanceType = typeof(TInstance);
+            var canBeKeys = GetCanBeKeys(instanceType);
 
-            foreach (var canBeRegisteredType in canBeRegisteredTypes)
-                Bind(canBeRegisteredType, rootObject);
+            foreach (var caneBeKey in canBeKeys)
+                Bind(caneBeKey, instance);
         }
 
-        public void BindInheritancesAndSelf<TRootObject>(TRootObject rootObject) where TRootObject : class
+        public void BindInheritancesAndSelf<TInstance>(TInstance instance) where TInstance : class
         {
-            var rootObjectType = typeof(TRootObject);
-            var canBeRegisteredTypes = GetCanBeRegisteredTypes(rootObjectType, true);
+            var instanceType = typeof(TInstance);
+            var canBeKeys = GetCanBeKeys(instanceType, true);
 
-            foreach (var canBeRegisteredType in canBeRegisteredTypes)
-                Bind(canBeRegisteredType, rootObject);
+            foreach (var caneBeKey in canBeKeys)
+                Bind(caneBeKey, instance);
         }
 
 
-        public bool TryResolve<TRegisteredObject>(out TRegisteredObject registeredObject)
-            where TRegisteredObject : class
+        public bool TryResolve<TKey>(out TKey keyObject)
+            where TKey : class
         {
-            registeredObject = null;
+            keyObject = null;
 
-            var registeredObjectType = typeof(TRegisteredObject);
-            Assert.IsTrue(!_entryPointTypes.Contains(registeredObjectType),
-                $"[EntryContainer::TryResolve] Cant use registeredObjectType: {registeredObjectType}.");
+            var key = typeof(TKey);
+            Assert.IsTrue(!_entryPoints.Contains(key),
+                $"[EntryContainer::TryResolve] Can't use key: {key} to find instance.");
 
-            if (!_rootObjectTypeMap.TryGetValue(registeredObjectType, out var rootObjectType))
+            if (!_instanceTypeMap.TryGetValue(key, out var instanceType))
             {
                 Debug.LogWarning(
-                    $"[EntryContainer::TryResolve] Not find registeredObject by registeredObjectType: {registeredObjectType}.");
+                    $"[EntryContainer::TryResolve] Not find instance by key: {key}.");
                 return false;
             }
 
-            var rootObjectData = _rootObjectDataMap[rootObjectType];
-            var rootObject = rootObjectData.RootObject;
+            var instanceData = _instanceDataMap[instanceType];
+            var instance = instanceData.Instance;
 
-            registeredObject = rootObject as TRegisteredObject;
+            keyObject = instance as TKey;
 
             return true;
         }
 
 
-        public void Remove<TRegisteredType>() where TRegisteredType : class =>
-            Remove(typeof(TRegisteredType));
+        public void RemoveKey<TKey>() where TKey : class =>
+            RemoveKey(typeof(TKey));
 
-        public void Remove(Type registeredType)
+        public void RemoveKey(Type key)
         {
-            if (!_rootObjectTypeMap.TryGetValue(registeredType, out var rootObjectType))
+            if (!_instanceTypeMap.TryGetValue(key, out var instanceType))
             {
-                Debug.LogError($"[EntryContainer::Remove] RegisteredType: {registeredType} is already removed.");
+                Debug.LogError($"[EntryContainer::RemoveKey] Key: {key} is already removed.");
                 return;
             }
 
-            _rootObjectTypeMap.Remove(registeredType);
+            _instanceTypeMap.Remove(key);
 
-            var rootObjectData = _rootObjectDataMap[rootObjectType];
-            rootObjectData.RemoveRegisteredType(registeredType);
+            var instanceData = _instanceDataMap[instanceType];
+            instanceData.RemoveKey(key);
 
-            if (rootObjectData.RegisteredTypeCount > 0)
+            if (instanceData.KeysCount > 0)
                 return;
 
-            RemoveRootObjectByRootObjectType(rootObjectType);
+            RemoveInstanceByInstanceType(instanceType);
         }
 
-        public void RemoveRootObject<TRegisteredType>() where TRegisteredType : class =>
-            RemoveRootObject(typeof(TRegisteredType));
+        public void RemoveInstance<TKey>() where TKey : class =>
+            RemoveInstance(typeof(TKey));
 
-        public void RemoveRootObject(Type registeredType) =>
-            RemoveRootObjectByRegisteredObjectType(registeredType);
+        public void RemoveInstance(Type key) =>
+            RemoveInstanceByKey(key);
 
-        public void RemoveAllRootObjects()
+        public void RemoveAllInstances()
         {
-            var rootObjectTypes = _rootObjectDataMap.Keys.ToArray();
-            foreach (var rootObjectType in rootObjectTypes)
-                RemoveRootObjectByRootObjectType(rootObjectType);
+            var instanceTypes = _instanceDataMap.Keys.ToArray();
+            foreach (var instanceType in instanceTypes)
+                RemoveInstanceByInstanceType(instanceType);
         }
 
 
         //private method
-        private void Bind<TRootObject>(Type registeredType, TRootObject rootObject)
+        private void Bind<TInstance>(Type key, TInstance instance)
         {
-            var rootObjectType = rootObject.GetType();
+            var instanceType = instance.GetType();
 
-            Assert.IsTrue(CheckCanBeRegisteredType(registeredType, rootObjectType),
-                $"[EntryContainer::Bind] Please check rootObjectType: {rootObjectType} inherits registeredType: {registeredType}.");
+            Assert.IsTrue(CheckCanBeKey(key, instanceType),
+                $"[EntryContainer::Bind] Please check instanceType: {instanceType} inherits key: {key}.");
 
-            if (_rootObjectTypeMap.TryGetValue(registeredType, out var currentRootObjectType))
+            if (_instanceTypeMap.TryGetValue(key, out var currentInstanceType))
             {
                 Debug.LogWarning(
-                    $"[EntryContainer::Bind] RegisteredType: {registeredType} is already registered. Current matching rootObjectType: {currentRootObjectType}");
+                    $"[EntryContainer::Bind] Key: {key} is already registered. Current matching instanceType: {currentInstanceType}");
                 return;
             }
 
 
-            if (!_rootObjectDataMap.ContainsKey(rootObjectType))
-                CreateRootObjectData(rootObject);
+            if (!_instanceDataMap.ContainsKey(instanceType))
+                CreateInstanceData(instance);
 
-            var rootObjectData = _rootObjectDataMap[rootObjectType];
-            rootObjectData.AddRegisteredType(registeredType);
-            _rootObjectTypeMap.Add(registeredType, rootObjectType);
+            var instanceData = _instanceDataMap[instanceType];
+            instanceData.AddKey(key);
+            _instanceTypeMap.Add(key, instanceType);
         }
 
-        private bool CheckCanBeRegisteredType(Type registeredType, Type rootObjectType)
+        private bool CheckCanBeKey(Type key, Type instanceType)
         {
-            var canBeRegisteredTypes = GetCanBeRegisteredTypes(rootObjectType, true);
-            return canBeRegisteredTypes.Contains(registeredType);
+            var canBeKeys = GetCanBeKeys(instanceType, true);
+            return canBeKeys.Contains(key);
         }
 
-        private Type[] GetCanBeRegisteredTypes(Type rootObjectType, bool isIncludeSelf = false)
+        private Type[] GetCanBeKeys(Type instanceType, bool isIncludeSelf = false)
         {
-            var rootObjectInterfaces = rootObjectType.GetInterfaces().ToList();
+            var instanceInterfaces = instanceType.GetInterfaces().ToList();
 
-            foreach (var rootObjectInterface in rootObjectInterfaces.ToArray())
-                if (_entryPointTypes.Contains(rootObjectInterface))
-                    rootObjectInterfaces.Remove(rootObjectInterface);
+            foreach (var instanceInterface in instanceInterfaces.ToArray())
+                if (_entryPoints.Contains(instanceInterface))
+                    instanceInterfaces.Remove(instanceInterface);
 
-            var rootObjectBaseType = rootObjectType.BaseType;
-            if (rootObjectBaseType != typeof(Object))
-                rootObjectInterfaces.Add(rootObjectBaseType);
+            var instanceBaseType = instanceType.BaseType;
+            if (instanceBaseType != typeof(Object))
+                instanceInterfaces.Add(instanceBaseType);
 
             if (isIncludeSelf)
-                rootObjectInterfaces.Add(rootObjectType);
+                instanceInterfaces.Add(instanceType);
 
-            return rootObjectInterfaces.ToArray();
+            return instanceInterfaces.ToArray();
         }
 
-        private Type[] GetEntryPointTypes(Type rootObjectType)
+        private Type[] GetentryPoints(Type instanceType)
         {
-            var rootObjectInterfaces = rootObjectType.GetInterfaces().ToList();
-            var entryPointTypes = new List<Type>();
+            var instanceInterfaces = instanceType.GetInterfaces().ToList();
+            var entryPoints = new List<Type>();
 
-            foreach (var rootObjectInterface in rootObjectInterfaces.ToArray())
-                if (_entryPointTypes.Contains(rootObjectInterface))
-                    entryPointTypes.Add(rootObjectInterface);
+            foreach (var instanceInterface in instanceInterfaces.ToArray())
+                if (_entryPoints.Contains(instanceInterface))
+                    entryPoints.Add(instanceInterface);
 
-            return entryPointTypes.ToArray();
+            return entryPoints.ToArray();
         }
 
-        private void CreateRootObjectData<TRootObject>(TRootObject rootObject)
+        private void CreateInstanceData<TInstance>(TInstance instance)
         {
-            var rootObjectType = rootObject.GetType();
-            var entryPointTypes = GetEntryPointTypes(rootObjectType);
-            var rootObjectData = new RootObjectData(rootObject, entryPointTypes);
-            _rootObjectDataMap.Add(rootObjectType, rootObjectData);
+            var instanceType = instance.GetType();
+            var entryPoints = GetentryPoints(instanceType);
+            var instanceData = new InstanceData(instance, entryPoints);
+            _instanceDataMap.Add(instanceType, instanceData);
 
-            AddFixedTickAndTickAndLateTickHandle(rootObject);
+            AddFixedTickAndTickAndLateTickHandle(instance);
         }
 
-        private void AddFixedTickAndTickAndLateTickHandle(object rootObject)
+        private void AddFixedTickAndTickAndLateTickHandle(object instance)
         {
-            if (rootObject is ITickable updatable)
+            if (instance is ITickable updatable)
                 _tickHandle += updatable.Tick;
 
-            if (rootObject is IFixedTickable fixedUpdatable)
+            if (instance is IFixedTickable fixedUpdatable)
                 _fixedTickHandle += fixedUpdatable.FixedTick;
 
-            if (rootObject is ILateTickable lateUpdatable)
+            if (instance is ILateTickable lateUpdatable)
                 _lateTickHandle += lateUpdatable.LateTick;
         }
 
-        private void RemoveFixedTickAndTickAndLateTickHandle(object rootObject)
+        private void RemoveFixedTickAndTickAndLateTickHandle(object instance)
         {
-            if (rootObject is ITickable updatable)
+            if (instance is ITickable updatable)
                 _tickHandle -= updatable.Tick;
 
-            if (rootObject is IFixedTickable fixedUpdatable)
+            if (instance is IFixedTickable fixedUpdatable)
                 _fixedTickHandle -= fixedUpdatable.FixedTick;
 
-            if (rootObject is ILateTickable lateUpdatable)
+            if (instance is ILateTickable lateUpdatable)
                 _lateTickHandle -= lateUpdatable.LateTick;
         }
 
-        private void RemoveRootObjectByRootObjectType(Type rootObjectType)
+        private void RemoveInstanceByInstanceType(Type instanceType)
         {
-            if (!_rootObjectDataMap.TryGetValue(rootObjectType, out var rootObjectData))
+            if (!_instanceDataMap.TryGetValue(instanceType, out var instanceData))
             {
                 Debug.LogWarning(
-                    $"[EntryContainer::RemoveRootObjectByRootObjectType] RootObjectType: {rootObjectType} is already removed.");
+                    $"[EntryContainer::RemoveInstanceByInstanceType] InstanceType: {instanceType} is already removed.");
                 return;
             }
 
-            var rootObject = rootObjectData.RootObject;
-            RemoveFixedTickAndTickAndLateTickHandle(rootObject);
+            var instance = instanceData.Instance;
+            RemoveFixedTickAndTickAndLateTickHandle(instance);
 
-            if (rootObject is IReleasable releasable)
-                releasable.Release();
+            if (instance is IDisposable disposable)
+                disposable.Dispose();
 
-            var registeredTypes = rootObjectData.RegisteredTypes;
-            foreach (var registeredType in registeredTypes)
+            var keys = instanceData.Keys;
+            foreach (var key in keys)
             {
-                _rootObjectTypeMap.Remove(registeredType);
-                rootObjectData.RemoveRegisteredType(registeredType);
+                _instanceTypeMap.Remove(key);
+                instanceData.RemoveKey(key);
             }
 
-            _rootObjectDataMap.Remove(rootObjectType);
+            _instanceDataMap.Remove(instanceType);
         }
 
-        private void RemoveRootObjectByRegisteredObjectType(Type registeredObjectType)
+        private void RemoveInstanceByKey(Type key)
         {
-            var hasValue = _rootObjectTypeMap.TryGetValue(registeredObjectType, out var rootObjectType);
+            var hasValue = _instanceTypeMap.TryGetValue(key, out var instanceType);
             Assert.IsTrue(hasValue,
-                $"[EntryContainer::RemoveRootObjectByRegisteredObjectType] RegisteredObjectType: {registeredObjectType} is already removed.");
+                $"[EntryContainer::RemoveInstanceByKey] Key: {key} is already removed.");
 
-            RemoveRootObjectByRootObjectType(rootObjectType);
+            RemoveInstanceByInstanceType(instanceType);
         }
     }
 }
