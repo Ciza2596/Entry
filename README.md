@@ -162,7 +162,7 @@ public class IFixedTickableExample : MonoBehaviour
 
 2 - **ITickable**
 
-Time: Nearly MonoBehaviour.Update()
+Timing: Nearly MonoBehaviour.Update()
 ```csharp
 public class Foo: ITickable
 {
@@ -184,7 +184,7 @@ public class ITickableExample : MonoBehaviour
 
 3 - **ILateTickable**
 
-Time: Nearly MonoBehaviour.LateUpdate()
+Timing: Nearly MonoBehaviour.LateUpdate()
 ```csharp
 public class Foo: ILateTickable
 {
