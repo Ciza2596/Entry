@@ -6,6 +6,10 @@ https://github.com/Ciza2596/Entry.git?path=Assets/Entry
 ## Info
 Entry is an object manager. It supports unity callback methods including FixedUpdate, Update and  LateUpdate.
 
+module | Test |
+--- | :---: |
+Entry | ✔️ |
+
 
 ## Methods
 
