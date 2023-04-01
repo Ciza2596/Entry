@@ -63,6 +63,9 @@ crashlytics-build.properties
 Assets/Plugins
 Assets/Plugins.meta
 
-# _Buildings
-_Buildings
+# Assets/Plugins
+Assets/Plugins
+
+# _Build
+_Build
 
