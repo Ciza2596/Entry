@@ -1,6 +1,6 @@
 # Entry
 ```
-https://github.com/Ciza2596/Entry.git?path=Assets/Entry
+https://github.com/Ciza2596/Entry.git?path=Assets/_Project/Entry
 ```
 
 ## Info
