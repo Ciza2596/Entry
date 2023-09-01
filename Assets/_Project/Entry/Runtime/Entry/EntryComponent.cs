@@ -10,7 +10,7 @@ namespace CizaEntry
         private Action<float> _updateCallback;
         private Action<float> _fixedUpdateCallback;
         private Action<float> _lateUpdateCallback;
-        private Action _applicationQuit;
+        private Action _onDisableCallback;
 
         
 
@@ -24,8 +24,8 @@ namespace CizaEntry
         private void LateUpdate() =>
             _lateUpdateCallback?.Invoke(Time.deltaTime);
 
-        private void OnApplicationQuit() =>
-            _applicationQuit?.Invoke();
+        private void OnDisable() =>
+            _onDisableCallback?.Invoke();
         
 
 
@@ -39,8 +39,8 @@ namespace CizaEntry
         public void SetLateUpdateCallback(Action<float> lateUpdateCallback) =>
             _lateUpdateCallback = lateUpdateCallback;
         
-        public void SetApplicationQuit(Action applicationQuit) =>
-            _applicationQuit = applicationQuit;
+        public void SeOnDisableCallback(Action onDisableCallback) =>
+            _onDisableCallback = onDisableCallback;
         
 
         public void RemoveCallback()
