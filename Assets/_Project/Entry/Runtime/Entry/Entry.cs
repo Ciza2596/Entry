@@ -92,8 +92,7 @@ namespace CizaEntry
 			_entryContainer.Bind(instance);
 		}
 
-		public static void Bind<TKey, TInstance>(TInstance instance)
-			where TKey : class where TInstance : class
+		public static void Bind<TKey, TInstance>(TInstance instance) where TKey : class where TInstance : class
 		{
 			if (CheckIsNotInitialized())
 				return;
@@ -101,8 +100,7 @@ namespace CizaEntry
 			_entryContainer.Bind<TKey, TInstance>(instance);
 		}
 
-		public static void BindAndSelf<TKey, TInstance>(TInstance instance)
-			where TKey : class where TInstance : class
+		public static void BindAndSelf<TKey, TInstance>(TInstance instance) where TKey : class where TInstance : class
 		{
 			if (CheckIsNotInitialized())
 				return;
@@ -126,8 +124,7 @@ namespace CizaEntry
 			_entryContainer.BindInheritancesAndSelf(instance);
 		}
 
-		public static bool TryResolve<TKey>(out TKey keyObject)
-			where TKey : class
+		public static bool TryResolve<TKey>(out TKey keyObject) where TKey : class
 		{
 			keyObject = null;
 			if (CheckIsNotInitialized())
