@@ -4,7 +4,7 @@ using UnityEngine;
 namespace CizaEntry
 {
     [DisallowMultipleComponent]
-    internal class EntryComponent : MonoBehaviour
+    internal class EntryMono : MonoBehaviour
     {
         //private variable
         private Action<float> _updateCallback;

@@ -8,10 +8,10 @@ namespace CizaEntry
 	{
 		//private variable
 		private static EntryContainer _entryContainer;
-		private static EntryComponent _entryComponent;
+		private static EntryMono _entryMono;
 
 		//public variable
-		public static bool   IsInitialized => _entryContainer != null && _entryComponent != null;
+		public static bool   IsInitialized => _entryContainer != null && _entryMono != null;
 		public static Type[] InstanceTypes => CheckIsNotInitialized() ? null : _entryContainer.InstanceTypes;
 		public static Type[] Keys          => CheckIsNotInitialized() ? null : _entryContainer.Keys;
 
@@ -29,12 +29,12 @@ namespace CizaEntry
 			var entryName = $"[{nameof(Entry)}]";
 			var entry     = new GameObject(entryName);
 			Object.DontDestroyOnLoad(entry);
-			_entryComponent = entry.AddComponent<EntryComponent>();
+			_entryMono = entry.AddComponent<EntryMono>();
 
-			_entryComponent.SetUpdateCallback(_entryContainer.Tick);
-			_entryComponent.SetFixedUpdateCallback(_entryContainer.FixedTick);
-			_entryComponent.SetLateUpdateCallback(_entryContainer.LateTick);
-			_entryComponent.SeOnDisableCallback(Release);
+			_entryMono.SetUpdateCallback(_entryContainer.Tick);
+			_entryMono.SetFixedUpdateCallback(_entryContainer.FixedTick);
+			_entryMono.SetLateUpdateCallback(_entryContainer.LateTick);
+			_entryMono.SeOnDisableCallback(Release);
 		}
 
 		public static void Release()
@@ -49,10 +49,10 @@ namespace CizaEntry
 			_entryContainer = null;
 
 
-			_entryComponent.RemoveCallback();
+			_entryMono.RemoveCallback();
 
-			var entryUpdateComponent = _entryComponent;
-			_entryComponent = null;
+			var entryUpdateComponent = _entryMono;
+			_entryMono = null;
 
 			Object.Destroy(entryUpdateComponent.gameObject);
 		}
