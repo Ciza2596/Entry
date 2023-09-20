@@ -10,7 +10,7 @@ namespace CizaEntry
 	public class EntryContainer
 	{
 		//private variable
-		private readonly IReadOnlyList<Type> _entryPoints = new List<Type>(3) { typeof(IFixedTickable), typeof(ITickable), typeof(ILateTickable), typeof(IDisposable) };
+		private readonly IReadOnlyList<Type> _entryPoints = new List<Type>(4) { typeof(IFixedTickable), typeof(ITickable), typeof(ILateTickable), typeof(IReleasable) };
 
 		private readonly Dictionary<Type, InstanceData> _instanceDataMap = new Dictionary<Type, InstanceData>();
 		private readonly Dictionary<Type, Type>         _instanceTypeMap = new Dictionary<Type, Type>();
@@ -89,8 +89,7 @@ namespace CizaEntry
 				Bind(caneBeKey, instance);
 		}
 
-		public bool TryResolve<TKey>(out TKey keyObject)
-			where TKey : class
+		public bool TryResolve<TKey>(out TKey keyObject) where TKey : class
 		{
 			keyObject = null;
 
@@ -245,8 +244,8 @@ namespace CizaEntry
 			var instance = instanceData.Instance;
 			RemoveFixedTickAndTickAndLateTickHandle(instance);
 
-			if (instance is IDisposable disposable)
-				disposable.Dispose();
+			if (instance is IReleasable releasable)
+				releasable.Release();
 
 			var keys = instanceData.Keys;
 			foreach (var key in keys)
