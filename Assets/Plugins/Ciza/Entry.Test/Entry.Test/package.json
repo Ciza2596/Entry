@@ -1,0 +1,22 @@
+{
+  "name": "com.ciza.entrytest",
+  "displayName": "Entry.Test",
+  "description": "Entry.Test",
+  "version": "0.0.7",
+  "unity": "2022.2",
+  "unityRelease": "1f1",
+  "dependencies": {},
+  "author": {
+    "name": "Ciza Huang",
+    "email": "Ciza2596@gmail.com",
+    "url": "https://www.youtube.com/channel/UCSGlWqXN4O2T3fyIJSB9MCA"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ciza2596/Entry.git"
+  },
+  "samples": [
+    {
+    }
+  ]
+}
